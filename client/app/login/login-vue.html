@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weeks of Life</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" rel="stylesheet">
+    <link href="/css/roboto.css" rel="stylesheet">
+    <link href="/css/vue-material.min.css" rel="stylesheet">
+    <link href="/css/vue-material.default.css" rel="stylesheet">
+    <link href="/css/common.css" rel="stylesheet">
+	<link href="/app/wol/wol2.css" rel="stylesheet">
+
+    <script src="/app/fixTime.js"></script>
+	<script>
+		FIX_TIME("SCRIPTS START LOADING");
+	</script>
+	
+	<!-- lib scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/ru.js"></script>
+    <script src="/lib/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>	
+	<script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
+    <script src="/app/fb.js"></script>
+	
+
+</head>
+<body>
+	<div id="vwol"></div>
+	
+	<template id="t_Login">
+		<div style="display:flex;position:absolute;width:100%;height:80%;align-items:center;justify-content:center">
+		<div style="width:300px;height:200px">
+            <div style="display:flex;justify-content:center;width:100%">
+                <div >
+                    <h1 style="font-family: Dosis, 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;font-size: 24px;">Weeks of Life</h1>
+                </div>
+            </div>
+			<md-field md-clearable>
+			  <label>Email:</label>
+			  <md-input v-model="email" placeholder="Email"></md-input>
+			</md-field>
+
+			<md-field>
+			  <label>Password:</label>
+			  <md-input v-model="password" type="password" placeholder="Password" @keyup.enter="onLoginClick()"></md-input>
+			</md-field>
+			<div style="width: 100%;margin-top: 20px;">
+				<md-button class="md-raised md-primary" @click="onLoginClick()">Log In</md-button>
+			</div>
+			<div v-if="invalidData" class="md-accent">
+				Invalid email or password
+			</div>
+		</div>
+	</template>
+	
+	<script src="/lib/vue.js"></script>
+	<script src="/lib/vue-material.min.js"></script>
+	<script>
+		Vue.use(VueMaterial.default);
+	</script>
+    <script>
+        var USE_LOCAL_SERVER = <%- USE_LOCAL_SERVER %>;
+    </script>
+	<script src="/app/login/login.js"></script>
+</body>
+</html>

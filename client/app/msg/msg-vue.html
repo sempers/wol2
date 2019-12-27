@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weeks of Life:Messages</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" rel="stylesheet">
+    <link href="/css/roboto.css" rel="stylesheet">
+
+    <link href="/css/vue-material.min.css" rel="stylesheet">
+    <link href="/css/vue-material.default.css" rel="stylesheet">
+    <link href="/css/common.css" rel="stylesheet">
+	<link href="/app/wol/wol2.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/app/msg/msg.css" rel="stylesheet">
+    <script src="/app/fixTime.js"></script>
+	<script>
+		FIX_TIME("SCRIPTS START LOADING");
+	</script>
+	
+	<!-- lib scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/ru.js"></script>
+    <script src="/lib/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+	
+	<script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
+    <script src="/app/fb.js"></script>
+
+</head>
+<body>
+	<div id="vwol"></div>
+	
+	<template id="template">
+        <div style="display:flex;padding-top:50px;justify-content:center;">
+            <wol-navbar :current="'msg'"></wol-navbar>
+            <wol-spinner :store="$store.state"></wol-spinner>
+            
+            <div class="md-layout md-gutter" style="max-height:800px" v-show="!$store.state.loading">
+                <div class="md-layout-item" style="overflow-y:scroll;min-width:800px">
+                    <md-table>
+                        <md-table-row>
+                            <md-table-head>#</md-table-head>
+                            <md-table-head>Пол</md-table-head>
+                            <md-table-head>Чат</md-table-head>
+                            <md-table-head>Сообщений</md-table-head>
+                            <md-table-head>Годы</md-table-head>
+                        </md-table-row>
+                        <md-table-row @click.left="selectMatch(chat)" @click.right.prevent="changeSex(chat)" v-for="(chat, index) in $store.state.chats">
+                            <md-table-cell style="width:30px">{{index+1}}</md-table-cell>
+                            <md-table-cell style="width:30px" ><span v-if="chat.stats">
+                                <md-icon :class="{'icon-man': chat.stats.sex == 'man', 'icon-woman': chat.stats.sex == 'woman', 'icon-unknown': chat.stats.sex == 'unknown'}">face</md-icon>
+                            </span></md-table-cell>
+                            <md-table-cell style="width:100px" >{{chat._id}}</md-table-cell>
+                            <md-table-cell md-numeric style="width:80px">{{chat.cnt}}</md-table-cell>
+                            <md-table-cell ><span v-if="chat.stats">{{chat.stats.years}}</span></md-table-cell>
+                        </md-table-row>
+                    </md-table>
+                </div>
+                <div class="md-layout-item" style="overflow-y:scroll">
+                    <md-table>
+                        <md-table-row>
+                            <md-table-head>Было</md-table-head>
+                            <md-table-head>Стало</md-table-head>
+                        </md-table-row>
+                        <md-table-row v-for="rule in $store.state.rules" class="md-dense" @dblclick="removeRule(rule)">
+                            <md-table-cell>{{rule.match}}</md-table-cell>
+                            <md-table-cell>{{rule.target}}</md-table-cell>
+                        </md-table-row>
+                        <md-table-row >
+                            <md-table-cell><md-field><md-input v-model="$store.state.nRule.match" placeholder="Match"></md-input></md-field></md-table-cell>
+                            <md-table-cell><md-field><md-input v-model="$store.state.nRule.target" placeholder="Target" @keyup.enter="addRule()"></md-input></md-field></md-table-cell>
+                        </md-table-row>
+                    </md-table>
+                </div>
+                <div class="md-layout-item" style="max-width:100px">
+                    <md-button class="md-accent md-raised" @click="correct()">Correct</md-button>
+                    <div class="chat-cntnr" style="left:0;max-height:720px;overflow-y:scroll;" v-show="$store.state.messages.length > 0" >
+                        <ul class="chat-column">
+                            <li class="msg" v-for="msg in $store.state.messages" :class="{me: !msg.isin}">
+                                <div class="msg-inner">
+                                    <div class="msg-header">
+                                        <img class="channel-icon" :src="'/img/icon/' + msg.chan + '.png'" />
+                                        <span class="msg-sender">{{msg.sndr}}</span>                                        
+                                        <span class="msg-date">{{msg.date | fmtDate}}</span>
+                                        <!--<div style="cursor:hand;float:right;" @click="deleteMessage(msg)">[x]</div>-->
+                                    </div>
+                                    <div class="msg-text" v-html="msg.text" ></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+		</div>
+	</template>
+	
+	<script src="/lib/vue.js"></script>
+	<script src="/lib/vue-material.min.js"></script>
+    <script src="/lib/vuex.min.js"></script>
+	<script>
+		Vue.use(VueMaterial.default);
+        Vue.use(Vuex);
+        </script>
+    <script>
+        var $server = {};
+        $server.USE_LOCAL_SERVER = <%- USE_LOCAL_SERVER %>;
+        $server.MODULES = "<%- MODULES.toString()%>".split(',');
+        $server.BASE_URL = $server.USE_LOCAL_SERVER ? "": "<%- BASE_URL %>";
+        $server.NAME = "<%- NAME %>";
+    </script>
+    <script src="/app/msg/msg-store.js"></script>
+    <script src="/app/common.js"></script>
+	<script src="/app/msg/msg-app.js"></script>
+</body>
+</html>
