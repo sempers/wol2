@@ -1,102 +1,102 @@
 <template>
 <div class="app-layout">
-            <wol-navbar :current="'wol'" v-on:show-map-dialog="showMapDialog()" v-on:logout="logout()"></wol-navbar>
-            <wol-spinner :store="store"></wol-spinner>
-            <transition name="fade">
-            <div v-show="!store.loading">
-                <div class="cntnr">
-                    <header style="padding-top:58px">
-                        <div>
-                            <div class="pl">
-                                <strong>Прожито {{store.lived.percentage}}</strong>, недель: <strong>{{store.lived.weeks}}</strong>, дней: <strong>{{store.lived.days}}</strong>, часов: <strong>{{store.lived.hours}}</strong>
-                            </div>
-                            <div class="pl weeks-infoed">
-                                Недель заполнено: <strong>{{c_infoed}} ({{((c_infoed / store.lived.weeks) * 100).toFixed(1) + '%'}})</strong>
-                            </div>
-                            <div class="pr" style="position:relative;left:-27px">
-                                <strong>Осталось {{store.remained.percentage}}</strong>, недель: <strong>{{store.remained.weeks}}</strong>, дней: <strong>{{store.remained.days}}</strong>, часов: <strong>{{store.remained.hours}}</strong>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div style="position:relative">
-                        <table class="yeartable clearfix">
-                            <tr v-for="(year_weeks, year, index) in store.years">
-                                <td class="yeartd year-header" valign="middle">{{year}}<span class="uninfoed" v-if="countUninfoed(year_weeks)">({{countUninfoed(year_weeks)}})</span></td>
-                                <td class="yeartd year-weeks" valign="middle">
-                                    <div class="week-placeholder" v-if="index === 0" :style="'width:' + store.firstYearPlaceHolderWidth + 'px'"></div>
-                                    <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week" v-on:week-clicked="editWeek(week)" v-on:week-mounted="mountWeek(week)"></week-item>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <div class="tag-bar taglist">
-                            <a v-for="ti in c_tags" href="" @click.prevent="setTagged(ti)" class="tag-link" v-show="ti.weekNums.length > 0" :class="{'strong': ti.weekNums.length>20, 'tag-selected': ti.tag == store.curTag}">{{ti.tag}}<small>&nbsp;</small>({{ti.weekNums.length}})&nbsp;&nbsp;&nbsp; </a>
-                            <md-field>
-                                <label>Поиск</label>
-                                <md-input type="text" v-model="store.searchedWord" style="width:300px" />
-                            </md-field>
-                            <div style="text-align:center">
-                                <md-button type="button" @click="searchWord()">Искать в описаниях</md-button>
-                            </div>
-                            <div>
-                                    <ul>
-                                        <li>
-                                            <div class="wi wi-inner ng"></div><div class="wi-icon-legend">#ng</div>
-                                            <div class="wi wi-inner dr"></div><div class="wi-icon-legend">#dr</div>
-                                            <div class="wi wi-inner buy"></div><div class="wi-icon-legend">#buy</div>
-                                            <div class="wi wi-inner mov"></div><div class="wi-icon-legend">#mov</div>
-                                            <div class="wi wi-inner games"></div><div class="wi-icon-legend">#games</div>
-                                            <div class="wi wi-inner major"></div><div class="wi-icon-legend">#major</div>
-                                            <div class="wi wi-inner interview"></div><div class="wi-icon-legend">#interview</div>
-                                            <div class="wi wi-inner buh"></div><div class="wi-icon-legend">#buh</div>
-                                            <div class="wi wi-inner acid"></div><div class="wi-icon-legend">#acid</div>
-                                            <div class="wi wi-inner meet"></div><div class="wi-icon-legend">#meet</div>
-                                            <div class="wi wi-inner crush"></div><div class="wi-icon-legend">#crush</div>
-                                            <div class="wi wi-inner love"></div><div class="wi-icon-legend">#love, #sex</div>
-                                            <div class="wi wi-inner breakup"></div><div class="wi-icon-legend">#breakup</div>
-                                            <div class="wi wi-inner ill"></div><div class="wi-icon-legend">#ill</div>
-                                            <div class="wi wi-inner exam"></div><div class="wi-icon-legend">#exam</div>
-                                            <div class="wi wi-inner death"></div><div class="wi-icon-legend">#death</div>
-                                            <div class="wi wi-inner bad"></div><div class="wi-icon-legend">#bad</div>
-                                            <div class="wi wi-inner sea"></div><div class="wi-icon-legend">#sea</div>
-                                            <div class="wi wi-inner abroad"></div><div class="wi-icon-legend">#abroad</div>
-                                        </li>
-                                    </ul>
-                                   
-                                </div>
-                        </div>                        
+    <wol-spinner :store="store"></wol-spinner>
+    <transition name="fade">
+    <div v-show="!store.loading">
+        <div class="cntnr">
+            <header style="padding-top:58px">
+                <div>
+                    <div class="pl">
+                        <strong>Прожито {{store.lived.percentage}}</strong>, недель: <strong>{{store.lived.weeks}}</strong>, дней: <strong>{{store.lived.days}}</strong>, часов: <strong>{{store.lived.hours}}</strong>
+                    </div>
+                    <div class="pl weeks-infoed">
+                        Недель заполнено: <strong>{{c_infoed}} ({{((c_infoed / store.lived.weeks) * 100).toFixed(1) + '%'}})</strong>
+                    </div>
+                    <div class="pr" style="position:relative;left:-27px">
+                        <strong>Осталось {{store.remained.percentage}}</strong>, недель: <strong>{{store.remained.weeks}}</strong>, дней: <strong>{{store.remained.days}}</strong>, часов: <strong>{{store.remained.hours}}</strong>
                     </div>
                 </div>
-                </div>
-            </transition>
-			<edit-dialog v-on:show-messages = "showMessages()" v-on:week-saved = "saveWeek()" v-on:prev-week = "prevWeek()" v-on:next-week="nextWeek()"></edit-dialog>
-			<map-dialog></map-dialog>
-			<message-dialog></message-dialog>
-		</div>
+            </header>
+
+            <div style="position:relative">
+                <table class="yeartable clearfix">
+                    <tr v-for="(year_weeks, year, index) in store.years">
+                        <td class="yeartd year-header" valign="middle">{{year}}<span class="uninfoed" v-if="countUninfoed(year_weeks)">({{countUninfoed(year_weeks)}})</span></td>
+                        <td class="yeartd year-weeks" valign="middle">
+                            <div class="week-placeholder" v-if="index === 0" :style="'width:' + store.firstYearPlaceHolderWidth + 'px'"></div>
+                            <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week" v-on:week-clicked="editWeek(week)" v-on:week-mounted="mountWeek(week)"></week-item>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="tag-bar taglist">
+                    <a v-for="ti in c_tags" href="" @click.prevent="setTagged(ti)" class="tag-link" v-show="ti.weekNums.length > 0" :class="{'strong': ti.weekNums.length>20, 'tag-selected': ti.tag == store.curTag}">{{ti.tag}}<small>&nbsp;</small>({{ti.weekNums.length}})&nbsp;&nbsp;&nbsp; </a>
+                    <md-field>
+                        <label>Поиск</label>
+                        <md-input type="text" v-model="store.searchedWord" style="width:300px" />
+                    </md-field>
+                    <div style="text-align:center">
+                        <md-button type="button" @click="searchWord()">Искать в описаниях</md-button>
+                    </div>
+                    <div>
+                            <ul>
+                                <li>
+                                    <div class="wi wi-inner ng"></div><div class="wi-icon-legend">#ng</div>
+                                    <div class="wi wi-inner dr"></div><div class="wi-icon-legend">#dr</div>
+                                    <div class="wi wi-inner buy"></div><div class="wi-icon-legend">#buy</div>
+                                    <div class="wi wi-inner mov"></div><div class="wi-icon-legend">#mov</div>
+                                    <div class="wi wi-inner games"></div><div class="wi-icon-legend">#games</div>
+                                    <div class="wi wi-inner major"></div><div class="wi-icon-legend">#major</div>
+                                    <div class="wi wi-inner interview"></div><div class="wi-icon-legend">#interview</div>
+                                    <div class="wi wi-inner buh"></div><div class="wi-icon-legend">#buh</div>
+                                    <div class="wi wi-inner acid"></div><div class="wi-icon-legend">#acid</div>
+                                    <div class="wi wi-inner meet"></div><div class="wi-icon-legend">#meet</div>
+                                    <div class="wi wi-inner crush"></div><div class="wi-icon-legend">#crush</div>
+                                    <div class="wi wi-inner love"></div><div class="wi-icon-legend">#love, #sex</div>
+                                    <div class="wi wi-inner breakup"></div><div class="wi-icon-legend">#breakup</div>
+                                    <div class="wi wi-inner ill"></div><div class="wi-icon-legend">#ill</div>
+                                    <div class="wi wi-inner exam"></div><div class="wi-icon-legend">#exam</div>
+                                    <div class="wi wi-inner death"></div><div class="wi-icon-legend">#death</div>
+                                    <div class="wi wi-inner bad"></div><div class="wi-icon-legend">#bad</div>
+                                    <div class="wi wi-inner sea"></div><div class="wi-icon-legend">#sea</div>
+                                    <div class="wi wi-inner abroad"></div><div class="wi-icon-legend">#abroad</div>
+                                </li>
+                            </ul>
+                            
+                        </div>
+                </div>                        
+            </div>
+        </div>
+        </div>
+    </transition>
+    <edit-dialog v-on:show-messages = "showMessages()" v-on:week-saved = "saveWeek()" v-on:prev-week = "prevWeek()" v-on:next-week="nextWeek()" ></edit-dialog>
+    <map-dialog></map-dialog>
+    <message-dialog></message-dialog>
+</div>
 </template>
 
 <script>
-import fb from '../utils/fb.js'
+//import fb from '../utils/fb.js'
+import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'
 import WeekModel from './components/WeekModel.js'
-import _ from 'underscore';
+import _ from 'underscore'
+import axios from 'axios'
 import $bus from '../bus.js'
 import $store from './store.js'
+import WolSpinner from '../common/WolSpinner.vue'
 import WeekItem from './components/WeekItem.vue'
-import WolNavbar from '../components/WolNavbar.vue'
-import WolSpinner from '../components/WolSpinner.vue'
 import EditDialog from './components/EditDialog.vue'
 import MapDialog from './components/MapDialog.vue'
 import MessageDialog from './components/MessageDialog.vue'
 
 export default {
-    el: "#vwol",
-
     data() {
         return {
             store: $store
         }
     },
+
+    components: {WeekItem, EditDialog, MessageDialog, MapDialog, WolSpinner},
 
     computed: {
         c_infoed() {
@@ -111,26 +111,24 @@ export default {
     created() {
         this.store.loading = true;
         LOG('created()', 'checking the auth with firebase');
-        fb.bindAuth(() => {
+        //fb.bindAuth(() => {
             LOG('created()', "REQUESTING THE DATA");
-            axios.get(`${window.$server.BASE_URL}/api/weeks`)
-                .then((response) => {
+            axios.get(`${$server.BASE_URL}/api/wol/weeks`)
+                .then(response => {
                     if (response.data) {
                         LOG('created()', "DATA RECEIVED");
                         let raw_data = response.data;
                         this.initHeader(raw_data);
                         this.initWeeks(raw_data);
-                        this.initMapData(raw_data);
                     } else {
-                        ERROR('created()', "loading /api/weeks failed")
+                        ERROR('created()', "loading /api/wol/weeks failed")
                     }
                 });
-        });
+        //});
     },
 
     mounted() {
         LOG('mounted()', 'WolApp MOUNTED');
-        window.__googleMapsLoaded = this.checkGoogleMapsLoaded;
     },
 
     updated() {
@@ -163,7 +161,7 @@ export default {
 
         logout() {
             this.store.loading = true;
-            fb.logout();
+            //fb.logout();
             window.location.replace('/login');
         },
 
@@ -204,7 +202,6 @@ export default {
             let weekNum = 0;    //текущий номер недели в жизни
             // начало недели, когда родился <int>
             let weekStartMoment = moment(data.birthdate).startOf("week");     //текущая дата
-
             const deathTime = (new Date(data.deathdate)).getTime();					 //смерть <int>
 
             let weeks = [];
@@ -235,15 +232,11 @@ export default {
             };  //текущая неделя
         },
 
-        initMapData(data) {
-            this.store.map = data.map;
-        },
-
         //------------------------------Показ диалогов-----------------------------------------------------------
         //показ диалога с сообщениями
         showMessages() {
-            this.store.curMessages = this.store.curWeek.messages;
             this.store.shownMessageDialog = true;
+            this.store.curMessages = this.store.curWeek.messages;
         },
 
         //показ диалога редактирования
@@ -256,8 +249,8 @@ export default {
         showMapDialog() {
             if (!this.store.shownMapDialog) {
                 this.store.shownMapDialog = true;
-                Vue.nextTick(() => {
-                    this.initMap();
+                this.$nextTick(() => {
+                    this.initTravels();
                 });
             }
         },
@@ -302,7 +295,7 @@ export default {
             if (week.messages.length && !forced)
                 return;
             week.msgLoading = true;
-            axios.get(`${window.$server.BASE_URL}/api/msg/${week.weekNum}`)
+            axios.get(`${$server.BASE_URL}/api/msg/${week.weekNum}`)
                 .then(
                     response => {
                         if (response.data) {
@@ -311,11 +304,11 @@ export default {
                             week.msgCount = _.reduce(week.messages, (memo, chat) => chat.messages.length + memo, 0);
                             LOG('loadMessages', `Messages loaded for week ${week.weekNum}, count ${week.msgCount}`);
                         }
-                    },
-                    (response) => {
-                        this.error(`cannot load messages for week ${week.weekNum}`, response, 'loadMessages');
                     }
-                );
+                )
+                .catch(error => {
+                    this.error(`cannot load messages for week ${week.weekNum}`, error, 'loadMessages');
+                });
         },
 
         /**
@@ -325,32 +318,32 @@ export default {
             const _week = this.store.curWeek;
             this.store.weeks[_week.weekNum].info = _week.editInfo;
 
-            axios.post(`${window.$server.BASE_URL}/api/weeks`,
+            axios.post(`${$server.BASE_URL}/api/wol/weeks`,
                 {
                     name: this.store.name,
                     weekNum: _week.weekNum,
                     info: _week.info,
                     msgCount: _week.msgCount
                 })
-                .then(
-                    response => {
-                        if (response.status === 200) {
-                            this.success(`Week ${_week.weekNum} saved to DB.`, 'saveWeek');
-                            this.tagsUpdate(_week);
-                        } else {
-                            this.error('error saving week', response, 'saveWeek');
-                        }
-                    },
-                    response => {
-                        this.error(`Error saving week:`, response, 'saveWeek');
+                .then(response => {
+                    if (response.status === 200) {
+                        this.success(`Week ${_week.weekNum} saved to DB.`, 'saveWeek');
+                        this.tagsUpdate(_week);
+                    } else {
+                        this.error('error saving week', response, 'saveWeek');
                     }
-                );
+                }
+                ).catch(error => {
+                    this.error(`Error saving week:`, error, 'saveWeek');
+                });
         },
 
         //-------------------------- Навигация в режиме неделек ------------------------------------------------------
         /**
          * предыдущая неделя
          */
+
+
         prevWeek() {
             if (!this.store.curWeek && this.store.curWeek.weekNum === 1) {
                 return;
@@ -498,79 +491,70 @@ export default {
         },
 
         //-------------- КАРТЫ -------------------------
-        saveMapInfo(pos) {
-            axios.post(`${window.$server.BASE_URL}/api/map/${vm.name}`, pos).then(
-                (response) => {
+        saveTravel(pos) {
+            axios.post(`${$server.BASE_URL}/api/travels`, pos).then(
+                response => {
                     if (response.status === 200) {
-                        LOG('saveMapInfo', "coords lat=" + pos.lat + "; lng=" + pos.lng + " successfully saved");
+                        LOG('saveTravel', "coords lat=" + pos.lat + "; lng=" + pos.lng + " successfully saved");
                     } else {
                         console.log(response.status);
                     }
-                },
-
-                (err) => {
-                    this.error("Error saving coords", err, "saveMapInfo")
-                }
-            )
+                }).catch(
+                    (err) => {
+                        this.error("Error saving coords", err, "saveTravel")
+                    }
+                );
         },
 
-        removeMapInfo(pos) {
-            axios.post(`${window.$server.BASE_URL}/api/unmap/${this.store.name}`, pos).then(
-                (response) => {
+        removeTravel(_id) {
+            axios.delete(`${$server.BASE_URL}/api/travels/${_id}`).then(
+                response => {
                     if (response.status === 200) {
-                        console.log("coords lat=" + pos.lat + "; lng=" + pos.lng + " successfully removed");
+                        LOG("removeTravel", `travel _id = ${_id} successfully removed`);
                     } else {
                         console.log(response.status);
                     }
-                },
-                (err) => {
-                    this.error("Error saving coords: ", err, 'removeMapInfo');
-                }
-            )
+                }).catch(
+                    (err) => {
+                        this.error("Error saving coords: ", err, 'removeTravel');
+                    }
+                );
         },
 
-        initMap() {
+        initTravels() {
             LOG("initMap", "start");
             let self = this;
-            let data = this.store;
+            axios.get(`${$server.BASE_URL}/api/travels`).then(
+                response => {
+                    let travels = response.data;
 
-            const uluru = {
-                lat: -25.363,
-                lng: 131.044
-            };
-            if (!data.map.length) {
-                data.map.push(uluru);
-            }
-            let map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 4,
-                center: data.map[data.map.length - 1]
-            });
-
-            function _createMarker(position) {
-                let marker = new google.maps.Marker({ position, map });
-                google.maps.event.addListener(marker, "dblclick", function () {
-                    self.removeMapInfo({
-                        lat: marker.getPosition().lat(),
-                        lng: marker.getPosition().lng()
+                    let map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 4,
+                        center: travels[travels.length - 1]
                     });
-                    marker.setMap(null);
+
+                    function _createMarker(travel) {
+                        let marker = new google.maps.Marker({ position: travel, map });
+                        marker._id = travel._id;
+                        google.maps.event.addListener(marker, "dblclick", function () {
+                            self.removeTravel(marker._id);
+                            marker.setMap(null);
+                        })
+                    }
+                    
+                    travels.forEach(_createMarker);
+
+                    google.maps.event.addListener(map, 'click', function (event) {
+                        _createMarker(event.latLng);
+                        self.saveTravel({
+                            lat: event.latLng.lat(),
+                            lng: event.latLng.lng()
+                        });
+                    });
+
+                    LOG("initMap", "map loaded");
                 })
-            }
-
-            for (let i = 0; i < data.map.length; i++) {
-                var mapPoint = data.map[i];
-                _createMarker(mapPoint);
-            }
-
-            google.maps.event.addListener(map, 'click', function (event) {
-                _createMarker(event.latLng);
-                self.saveMapInfo({
-                    lat: event.latLng.lat(),
-                    lng: event.latLng.lng()
-                });
-            });
-
-            LOG("initMap", "map loaded");
+                .catch(err => LOG('initMap', 'initMap failed:'));
         }
     }
 }

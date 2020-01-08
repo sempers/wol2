@@ -1,0 +1,6 @@
+var $server = {
+	USE_LOCAL_SERVER: <%- USE_LOCAL_SERVER %>,
+	MODULES: "<%- MODULES.toString()%>".split(','),
+	BASE_URL: (<%- USE_LOCAL_SERVER %> ? "": "<%- BASE_URL %>"),
+	NAME: "<%- NAME %>"
+};

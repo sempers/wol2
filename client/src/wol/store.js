@@ -1,4 +1,6 @@
-export default Vuex.store({
+import moment from 'moment'
+
+export default {
 	loading: false,
 
 	name: window.$server.NAME,
@@ -60,5 +62,5 @@ export default Vuex.store({
 			return moment(date).local().format('DD.MM.YYYY HH:mm:ss');
 		}
 	}
-});
+};
 

@@ -73,22 +73,22 @@ Vue.component("EditDialog", {
 	<md-dialog id="editDialog" :md-active.sync="store.shownEditDialog" >
 			<md-dialog-content>
                 <div class="pl md-title">{{store.curWeek.desc}}</div>
-                <div class="close-button" @click="store.shownEditDialog = false">
+                <div class="action-btn" @click="store.shownEditDialog = false">
                     <md-button class="md-icon-button md-dense">
                         <md-icon>clear</md-icon>
                     </md-button>
                 </div>
-                <div class="close-button" @click="goNext()">
+                <div class="action-btn hide-mobile" @click="goNext()">
                     <md-button class="md-icon-button md-dense">
                         <md-icon>arrow_forward</md-icon>
                     </md-button>
                 </div>
-                <div class="close-button" @click="goPrevious()">
+                <div class="action-btn hide-mobile" @click="goPrevious()">
                     <md-button class="md-icon-button md-dense">
                         <md-icon>arrow_back</md-icon>
                     </md-button>
                 </div>
-                <div class="colored-flags">
+                <div class="colored-flags hide-mobile">
                     <ul style="margin:0">
                         <li class="colored-flag" v-for="cf in store.curWeek.colored_flags" :style="'background-color:' + cf.color">{{cf.name}}</li>
                     </ul>
@@ -120,17 +120,23 @@ Vue.component("EditDialog", {
             if (!this.isMobile && event.key == "Enter" && !event.altKey && !event.shiftKey && !event.ctrlKey) {
                 event.preventDefault();
                 this.onSave(true);
+            } else {
+                if (event.keyCode == 39 && event.ctrlKey) { //right arrow
+                    this.goNext();
+                }
+                if (event.keyCode == 37 && event.ctrlKey) { //left arrow
+                    this.goPrevious();
+                }
             }
         },
 
         adjustArea() {
             Vue.nextTick(() => {
                 let el = document.getElementById("week_info_textarea");
-                if (!el)
-                    return;
-                el.style.height = "1px";
-                el.style.height = `${el.scrollHeight + 6}px`;
-                el.scrollTop = 0;
+                if (el) {
+                    el.style.height = "1px";
+                    el.style.height = `${Math.round(el.scrollHeight) + 6}px`;
+                }
             });            
         },
 
@@ -160,52 +166,66 @@ Vue.component("EditDialog", {
 Vue.component("MessageDialog", {
     data() {
         return {
-            store: $store
+            store: $store,
+            curChat: {messages: [], chat: ""}
         };
     },
 
     template: `
         <md-dialog id="msgDialog" class="msg-dialog" :md-active.sync="store.shownMessageDialog">
-          <md-dialog-content style="max-height:1000px">
+          <md-dialog-content>
             <div class="pl md-title">{{store.curWeek.desc}}</div>
-            <div class="close-button" @click="store.shownMessageDialog = false">
+            <div class="action-btn" @click="store.shownMessageDialog = false">
               <md-button class="md-icon-button md-dense">
                 <md-icon>clear</md-icon>
               </md-button>
             </div>
             <div style="clear:both;padding-top:12px;padding-bottom:12px">
-              <div v-if="!store.curMessages.length" style="height:150px;text-align:center;vertical-align:middle">
-                <p>Сообщений не найдено</p>
-              </div>
-              <div style="width:100%;display:block">
-              <md-tabs md-alignment="fixed">
-                <md-tab v-for="(chat,index) in store.curMessages" :key="chat.chat" :md-label="chat.chat" @click="makeUnvisible(index)">
-                  <div class="chat-cntnr" v-show="index === store.curMsgTab" :class="{'col2': chat.messages.length >= 20 && chat.messages.length < 40, 'col3':chat.messages.length >= 40 && chat.messages.length < 60, 'col4': chat.messages.length >= 60 && chat.messages.length < 80, 'col5': chat.messages.length >= 80 }" >
-                    <ul class="chat-column">
-                      <li class="msg" v-for="msg in chat.messages" :class="{me: !msg.isin}">
-                        <div class="msg-inner">
-                          <div class="msg-header">
-                            <img class="channel-icon" :src="'/img/icon/' + msg.chan + '.png'" />
-                            <span class="msg-sender">{{msg.sndr}}</span>
-                            <span class="msg-date">{{msg.date | fmtDate}}</span>
-                          </div>
-                          <div class="msg-text" v-html="msg.text" />
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </md-tab>
-              </md-tabs>
-              </div>
+                <div v-if="!store.curWeek || !store.curWeek.messages || !store.curWeek.messages.length" style="height:150px;text-align:center;vertical-align:middle">
+                    <p>Сообщений не найдено</p>
+                </div>
+                <div class="md-layout md-gutter">
+                    <div class="md-layout-item names-column" >
+                        <md-table>
+                            <md-table-row v-for="(chat, index) in store.curWeek.messages" :key="chat.chat" @click="showChat(chat)">
+                                <md-table-cell style="cursor:pointer" >{{chat.chat}} ({{chat.messages.length}})
+                                </md-table-cell>
+                            </md-table-row>
+                        </md-table>                 
+                    </div>
+                    <div class="md-layout-item" v-show="curChat.messages.length > 0" >
+                        <ul class="chat-column" id="chat_column">
+                            <li class="msg" v-for="msg in curChat.messages" :class="{me: !msg.isin}">
+                                <div class="msg-inner">
+                                <div class="msg-header">
+                                    <img class="channel-icon" :src="'/img/icon/' + msg.chan + '.png'" />
+                                    <span class="msg-sender">{{msg.sndr}}</span>
+                                    <span class="msg-date">{{msg.date | fmtDate}}</span>
+                                </div>
+                                <div class="msg-text" v-html="msg.text"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
           </md-dialog-content>
-		    </md-dialog>
+	    </md-dialog>
     `,
     
     methods: {
-        makeUnvisible(index) {
-            this.store.curMsgTab = index;
+        showChat(chat) {
+            this.curChat = chat;
+            document.getElementById("chat_column").scrollTop = 0;
+        },
+
+        clearCurChat() {
+            this.curChat = { messages: [], chat:""}
         }
+    },
+
+    mounted() {
+        $bus.$on("curweek-changed", this.clearCurChat);
     },
 
     filters: $store.filters

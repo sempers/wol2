@@ -1,14 +1,17 @@
 const _       = require("underscore");
 let db        = require("./db");
-const config = require('../config');
-
+const config = require('./config');
 const utils  = require('./utils');
 let _obj     = utils._obj;
 let _endPost = require("./endReq")("__cache__/api/weeks");
 
 //GET /[:name]
 function renderWol(req, res) {
-    res.render("wol/wol-vue.html", config.serverParams());
+    res.render("index.html");
+}
+
+function renderServerParams(req, res) {
+    res.render("server.html", config.serverParams());	
 }
 
 // GET /test/wol
@@ -69,7 +72,8 @@ module.exports = {
     getWeeks,
     saveWeek,
     test,
-    renderLogin
+    renderLogin,
+    renderServerParams
 };
 
 //create    add

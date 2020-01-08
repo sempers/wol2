@@ -1,17 +1,25 @@
-import Vue from 'vue'
-import router from './router'
-import VueMaterial from 'vue-material'
-import VueRouter from 'vue-router'
-import WolApp from './modules/wol/WolApp.vue'
+import Vue from "vue"
+import VueMaterial from "vue-material"
+import WolApp from "./wol/WolApp.vue"
+import WolNavbar from "./common/WolNavbar.vue"
 
-const router = new VueRouter({ routes: [
-    {path: "/", component: WolApp},
-    {path: "/money", component: MoneyApp}
-]});
+Vue.use(VueMaterial);
 
-Vue.use(VueMaterial.default);
+window.vm = new Vue({
+	el: "#app",
 
-new Vue({
-    el: "#app",
-    router
+	components: { WolNavbar, WolApp },
+
+	data() {
+		return {
+			current: "wol"
+		};
+	},
+
+	template: `
+	<div>
+		<wol-navbar :current="current" v-on:show-map-dialog="showMapDialog()" v-on:logout="logout()"></wol-navbar>
+		<wol-app></wol-app>
+	</div>
+	`
 });

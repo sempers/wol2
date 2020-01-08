@@ -22,7 +22,8 @@ let $store = {
 		info: "",
 		index: -1,
 		weekNum: -1,
-		colored_flags: []
+		colored_flags: [],
+		messages: []
 	},
 
 	curMessages: [],

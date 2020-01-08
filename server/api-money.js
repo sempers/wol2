@@ -7,7 +7,7 @@ const axios = require("axios");
 let db = require("./db");
 const async = require("async");
 const cache = require("./cache");
-const config = require('../config');
+const config = require('./config');
 
 let _obj = require('./utils')._obj;
 let endReq = require("./endReq")("__cache__/api/money");

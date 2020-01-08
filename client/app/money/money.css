@@ -661,7 +661,6 @@ div.tooltip {
   display: inline-table;
 }
 #chart {
-  /* width: 100%; */
   min-width: 1200px;
   border: 0;
 }

@@ -72,6 +72,7 @@ h1 {
   display: inline-block;
   background: #f5f5f5;
 }
+/* WEEK ITEM */
 .wi {
   margin: 0;
   padding: 0;
@@ -84,7 +85,7 @@ h1 {
 .wi.selected {
   border-color: orange;
 }
-.wi.tagged {
+.wi .tagged {
   border-color: yellow;
 }
 .wi-inner {
@@ -93,12 +94,12 @@ h1 {
   border: 1px solid #aaa;
   position: relative;
 }
-.wi-inner.future {
-  border: 1px dotted black;
-  background: white;
-}
-.infoed .wi-inner {
-  border: 1px solid black;
+.wi-icon-legend {
+  margin-left: 4px;
+  display: inline-block;
+  margin-right: 4px;
+  position: relative;
+  top: -3px;
 }
 .wi-bg {
   position: absolute;
@@ -133,9 +134,16 @@ h1 {
 .wi-icon-placeholder:last-child {
   margin-right: 0;
 }
+.wi-inner.future {
+  border: 1px dotted black;
+  background: white;
+}
+.infoed .wi-inner {
+  border: 1px solid black;
+}
 .infoed .wi-bg,
 .infoed .wi-bg2 {
-  opacity: 1.0;
+  opacity: 1;
 }
 .wi-icon {
   position: absolute;
@@ -188,30 +196,60 @@ h1 {
   color: black;
   white-space: pre-wrap;
 }
+/* ALL DIALOGS */
+.md-dialog {
+  z-index: 100;
+  border-radius: 4px;
+  transform: translate(-50%, -50%) !important;
+}
+.md-dialog-content {
+  padding-bottom: 0;
+}
+.md-dialog-actions {
+  min-height: 48px;
+  padding: 0 24px 8px 8px;
+}
+.md-button-content {
+  margin-left: -10px;
+  margin-right: 6px;
+}
+.action-btn {
+  float: right;
+  position: relative;
+  top: -8px;
+}
+.action-btn button {
+  margin: 2px;
+}
+.action-btn .md-button .md-ripple {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 4px;
+  display: inline-block;
+  margin: 0;
+}
 /* EDIT DIALOG */
 #editDialog {
-  display: inline-table;
-  transform: translate(-50%, -50%) scale(1) !important;
+  border-radius: 4px;
 }
 #editDialog .md-dialog-content:first-child {
   padding-top: 22px;
   width: 800px !important;
 }
 @media (max-width: 1080px) {
-  #editDialog {
-    display: inline-table;
-    transform: translate(-50%, -50%) scale(1) !important;
-  }
   #editDialog .md-dialog-content:first-child {
     padding-top: 22px;
     width: 600px !important;
+  }
+  .hide-mobile {
+    display: none;
   }
 }
 #week_info_textarea {
   font-size: 14px;
   line-height: 26px;
   min-height: 78px;
-  padding-bottom: 0;
+  padding-bottom: 6px;
 }
 .md-field .md-textarea {
   max-height: 240px;
@@ -220,7 +258,7 @@ h1 {
   display: inline-flex;
   margin-right: 4px;
   justify-content: center;
-  border-radius: 3px;
+  border-radius: 4px;
   color: black;
   font-size: 12px;
   align-items: center;
@@ -241,12 +279,6 @@ h1 {
   background-color: #f0f0f0;
   margin-right: 4px;
   padding: 0 4px 0 4px;
-}
-@media (max-width: 1080px) {
-  .colored-flags,
-  .tag-icons {
-    display: none;
-  }
 }
 .weeks-infoed {
   color: #448aff;
@@ -403,41 +435,28 @@ a.tag-link.tag-selected {
 }
 /* MESSAGE DIALOG */
 #msgDialog {
-  max-width: 1860px;
-  min-height: 440px;
-  display: inline-table;
+  width: 660px !important;
+  min-height: 600px;
+  overflow-y: auto;
 }
 .chat-cntnr {
   width: 400px;
   margin: 0 auto;
-  position: relative;
-  left: -64px;
 }
-.col2 {
-  width: 640px;
-  column-count: 2;
-}
-.col3 {
-  width: 960px;
-  column-count: 3;
-}
-.col4 {
-  width: 1280px;
-  column-count: 4;
-}
-.col5 {
-  width: 1600px;
-  column-count: 5;
+.names-column {
+  max-width: 250px;
 }
 ul.chat-column {
-  width: 270px;
+  width: 330px;
   list-style: none;
   margin-right: 5px;
   margin-top: 0;
   padding: 0 5px;
   background-color: lightblue;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid #999;
+  max-height: 500px;
+  overflow-y: scroll;
 }
 li.msg {
   width: 100%;
@@ -508,35 +527,6 @@ div#map {
 }
 .md-overlay {
   z-index: 5 !important;
-}
-.md-dialog {
-  z-index: 100;
-}
-.md-dialog-content {
-  padding-bottom: 0;
-}
-.md-dialog-actions {
-  min-height: 48px;
-  padding: 0 24px 8px 8px;
-}
-.md-button-content {
-  margin-left: -10px;
-  margin-right: 6px;
-}
-.close-button {
-  float: right;
-  position: relative;
-  top: -8px;
-}
-.close-button button {
-  margin: 2px;
-}
-.close-button .md-button .md-ripple {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  display: inline-block;
-  margin: 0;
 }
 #mapDialog {
   max-height: 90%;

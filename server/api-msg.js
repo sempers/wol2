@@ -2,7 +2,7 @@ const util = require("util");
 const _    = require("underscore");
 const os   = require('os');
 let db     = require("./db");
-const config = require("../config");
+const config = require("./config");
 
 let _obj     = require('./utils')._obj;
 let _endPost = require("./endReq")();

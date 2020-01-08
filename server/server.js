@@ -16,7 +16,7 @@ var app = express();
 
 app.engine("html", cons.ejs);
 app.set('view engine', 'html');
-app.set("views", path.resolve(__dirname, '../'));
+app.set("views", path.resolve(__dirname, '../client'));
 app.set('trust proxy', 1);
 
 app.use(express.static(path.resolve(__dirname, '../client'), {
@@ -31,6 +31,9 @@ app.use(cookieSession({
     keys: ["29b6BCZ*1q"],
     maxAge: 30 * 24 * 60 * 60 * 1000
 }));
+
+//render server values
+app.get("/lib/server.js", api_wol.renderServerParams);
 
 //html
 app.get("/wol", api_wol.renderWol);

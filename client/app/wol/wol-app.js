@@ -40,7 +40,6 @@ new Vue({
 
     mounted() {
         LOG('mounted()', 'WolApp MOUNTED');
-        //window.__googleMapsLoaded = this.checkGoogleMapsLoaded;
     },
 
     updated() {
@@ -114,7 +113,6 @@ new Vue({
             let weekNum = 0;    //текущий номер недели в жизни
             // начало недели, когда родился <int>
             let weekStartMoment = moment(data.birthdate).startOf("week");     //текущая дата
-
             const deathTime = (new Date(data.deathdate)).getTime();					 //смерть <int>
 
             let weeks = [];
@@ -148,8 +146,8 @@ new Vue({
         //------------------------------Показ диалогов-----------------------------------------------------------
         //показ диалога с сообщениями
         showMessages() {
-            this.store.curMessages = this.store.curWeek.messages;
             this.store.shownMessageDialog = true;
+            this.store.curMessages = this.store.curWeek.messages;
         },
 
         //показ диалога редактирования
