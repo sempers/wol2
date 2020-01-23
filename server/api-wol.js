@@ -1,17 +1,10 @@
-const _       = require("underscore");
 let db        = require("./db");
 const config = require('./config');
-const utils  = require('./utils');
-let _obj     = utils._obj;
 let _endPost = require("./endReq")("__cache__/api/weeks");
 
 //GET /[:name]
 function renderWol(req, res) {
-    res.render("index.html");
-}
-
-function renderServerParams(req, res) {
-    res.render("server.html", config.serverParams());	
+    res.render("wol/wol-vue.html", config.serverParams());
 }
 
 // GET /test/wol
@@ -32,7 +25,7 @@ function getWeeks(req, res) {
             .exec((e1, weeks) => {
                 if (!e1 && weeks) {
                     data.weekInfo = {};
-                    weeks.map(_obj).forEach((wk) => {
+                    weeks.map(doc => doc.toObject()).forEach((wk) => {
                         data.weekInfo[wk.weekNum] = wk;
                     });
                     res.json(data);
@@ -72,8 +65,7 @@ module.exports = {
     getWeeks,
     saveWeek,
     test,
-    renderLogin,
-    renderServerParams
+    renderLogin
 };
 
 //create    add

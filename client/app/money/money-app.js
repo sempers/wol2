@@ -37,30 +37,28 @@ let vm = new Vue({
     created() {
         this.store.loading = true;
         LOG('created()', 'checking the auth with firebase');
-        fb.bindAuth(() => {
+        fb.bindAuth(async () => {
             LOG('created()', 'REQUESTING THE DATA')
-            axios.get(`${$server.BASE_URL}/api/money`)
-                .then(response => {
-                    if (response.data) {
-                        let raw_data = response.data;
-                        this.store.accounts = raw_data.accounts;
-                        this.store.transactions = raw_data.transactions;
-                        this.store.base_tags = raw_data.pinned_tags;
-                        this.initRates(raw_data.rates);
-                        this.initAccounts();
-                        this.initBaseTags();
-                        this.initTransactions();
-                        this.calcAll();
-                        this.moveToday();
-                        this.store.loading = false;
-                        $bus.$emit('data-loaded');
-                        LOG('created()', 'DATA LOADED');
-                        setInterval(this.recalc, 60 * 30 * 1000);
-                    } else {
-                        ERROR('created()', "loading /api/money failed");
-                    }
-                }, 'money');
-        });
+            const response = await axios.get(`${$server.BASE_URL}/api/money`);
+            if (response.data) {
+                let raw_data = response.data;
+                this.store.accounts = raw_data.accounts;
+                this.store.transactions = raw_data.transactions;
+                this.store.base_tags = raw_data.pinned_tags;
+                this.initRates(raw_data.rates);
+                this.initAccounts();
+                this.initBaseTags();
+                this.initTransactions();
+                this.calcAll();
+                this.moveToday();
+                this.store.loading = false;
+                $bus.$emit('data-loaded');
+                LOG('created()', 'DATA LOADED');
+                setInterval(this.recalc, 60 * 30 * 1000);
+            } else {
+                ERROR('created()', "loading /api/money failed");
+            }
+        }, 'money');
     },
 
     mounted() {
@@ -118,16 +116,15 @@ let vm = new Vue({
             }
         },
 
-        saveRates() {
+        async saveRates() {
             let _rates = this.store.rates[0];
             delete _rates.date;
-            axios.post(`${$server.BASE_URL}/api/money/rates`, _rates).then(
-                () => {
-                    this.success('Rates have been saved', 'saveRates');
-                },
-                response => {
-                    this.error('Error saving rates', response, 'saveRates');
-                });
+            try {
+                await axios.post(`${$server.BASE_URL}/api/money/rates`, _rates)
+                this.success('Rates have been saved', 'saveRates');
+            } catch (err) {
+                this.error('Error saving rates', err, 'saveRates');
+            }
         },
 
         /**
@@ -215,8 +212,7 @@ let vm = new Vue({
                 Vue.set(tx, "isRemoved", false);
                 Vue.set(tx, "isEdited", false);
                 //проставляем buy-sell
-                if (tx.type == "transfer" && tx.tag.includes("Invest_"))
-                {
+                if (tx.type == "transfer" && tx.tag.includes("Invest_")) {
                     switch (tx.tag) {
                         case "Invest_Usd":
                             if (tx.dst == "SUSD")
@@ -224,19 +220,19 @@ let vm = new Vue({
                             else if (tx.src == "SUSD")
                                 tx.trade = "sell";
                             break;
-                            case "Invest_Eur":
-                                if (tx.dst == "SEUR")
-                                    tx.trade = "buy";
-                                else if (tx.src == "SEUR")
-                                    tx.trade = "sell";
-                                break;
-                            case "Invest_Btc":
+                        case "Invest_Eur":
+                            if (tx.dst == "SEUR")
+                                tx.trade = "buy";
+                            else if (tx.src == "SEUR")
+                                tx.trade = "sell";
+                            break;
+                        case "Invest_Btc":
                             if (tx.dst == "BTC")
                                 tx.trade = "buy";
                             else if (tx.src == "BTC")
                                 tx.trade = "sell";
                             break;
-                            case "Invest_Bnb":
+                        case "Invest_Bnb":
                             if (tx.dst == "BNB")
                                 tx.trade = "buy";
                             else if (tx.src == "BNB")
@@ -255,16 +251,17 @@ let vm = new Vue({
         /**
          * recalculate everything after receiving rate updates
          */
-        recalc() {
-            axios.get(`${$server.BASE_URL}/api/rates`).then(
-                response => {
-                    if (response.data) {
-                        LOG('recalc', "received new rates");
-                        this.initRates(response.data);
-                        this.calcAll();
-                    }
+        async recalc() {
+            try {
+                const response = await axios.get(`${$server.BASE_URL}/api/money/rates`);
+                if (response.data) {
+                    LOG('recalc', "received new rates");
+                    this.initRates(response.data);
+                    this.calcAll();
                 }
-            );
+            } catch (err) {
+                ERROR("recalc", "error while recalculating new rates")
+            }
         },
 
         /**
@@ -272,7 +269,7 @@ let vm = new Vue({
          */
         calcAll() {
             //blank stats
-           _.extend(this.store.stats, {
+            _.extend(this.store.stats, {
                 totalBalance: 0,
                 totalBalance_USD: 0,
                 net_worth: 0,
@@ -303,7 +300,7 @@ let vm = new Vue({
                 if (!acc.hidden) {
                     let balance = this.store.convert(acc.balance, acc.currency, "RUB"); //OK - we count this at NOW moment
                     __s.totalBalance += balance;
-                    
+
                     switch (acc.category) {
                         case "rouble":
                             __s.rub_ratio += balance;
@@ -348,30 +345,31 @@ let vm = new Vue({
                 for (var i = 0; i < txs.length; i++) {
                     let tx = txs[i];
                     let src_currency = self.store.acc_currency(tx.src);
-                    if (src_currency == base_curr[0]) {     //BUYING
+                    if (src_currency == base_curr[0]) { //BUYING
                         sum_base_curr += tx.amount;
                         sum_invest_curr += tx.dst_amount;
                     } else if (base_curr.length > 1 && src_currency == base_curr[1]) {
                         let secondary_rate_re = (/\$\(([\d\.]+)\)/gi);
                         var result = secondary_rate_re.exec(tx.desc);
-                        var secondary_rate = +result[1];
-                        sum_base_curr += tx.amount / secondary_rate;
-                        sum_invest_curr += tx.dst_amount;
-                    }                     
-                    else if (self.store.acc_currency(tx.src) == invest_curr) { //SELLING
+                        if (result) {
+                            var secondary_rate = +result[1];
+                            sum_base_curr += tx.amount / secondary_rate;
+                            sum_invest_curr += tx.dst_amount;
+                        }
+                    } else if (self.store.acc_currency(tx.src) == invest_curr) { //SELLING
                         sum_base_curr -= tx.dst_amount;
                         sum_invest_curr -= tx.amount;
                     }
                 }
                 let avg_entrance = sum_base_curr / sum_invest_curr;
-                
+
                 let rate = self.store.rate(invest_curr, 0) / self.store.rate(base_curr[0], 0);
                 let profit = Math.round((rate - avg_entrance) * self.store.acc(_acc).balance);
-           
+
                 let profit_pct = profit / sum_base_curr * 100;
                 if (sum_base_curr < 0) {
                     avg_entrance = 0.001;
-                    profit_pct =  profit /-sum_base_curr * 100;
+                    profit_pct = profit / -sum_base_curr * 100;
                 }
                 return {
                     avg_entrance,
@@ -379,13 +377,16 @@ let vm = new Vue({
                     profit_pct
                 };
             }
-           
+
             _.extend(__s.rateItems["USDRUB"], _calcAvgEntrance("USD", ["RUB"], "Invest_Usd", "SUSD", 2017));
             _.extend(__s.rateItems["EURRUB"], _calcAvgEntrance("EUR", ["RUB"], "Invest_Eur", "SEUR", 2017));
             _.extend(__s.rateItems["BTCUSD"], _calcAvgEntrance("BTC", ["USD", "RUB"], "Invest_Btc", "BTC", 2019));
             _.extend(__s.rateItems["BNBUSD"], _calcAvgEntrance("BNB", ["USD"], "Invest_Bnb", "BNB", 2019));
+            _.extend(__s.rateItems["ETHUSD"], _calcAvgEntrance("ETH", ["USD"], "Invest_Eth", "ETH", 2020));
 
-            __s.totalBalance_USD = this.$options.filters.fmtAmount(this.store.convert(__s.totalBalance, "RUB", "USD"), {places: 0}); //OK - we count this at the NOW moment
+            __s.totalBalance_USD = this.$options.filters.fmtAmount(this.store.convert(__s.totalBalance, "RUB", "USD"), {
+                places: 0
+            }); //OK - we count this at the NOW moment
         },
 
 
@@ -455,7 +456,6 @@ let vm = new Vue({
             }
         },
 
-
         /**
          * showMonth() for SPECIAL ACCOUNTS
          */
@@ -477,7 +477,6 @@ let vm = new Vue({
             };
             LOG('showMonthSpecial', `acc ${this.store.cur.account.name} is shown, balance is ${this.store.cur.begin}`);
         },
-
 
         /**
          * calculating and showing a MONTH or a YEAR - main function
@@ -600,24 +599,27 @@ let vm = new Vue({
             __cur.delta = end - begin;
             __cur.deltaPercent = __cur.delta / Math.abs(begin) * 100;
             __cur.rateNet = __cur.delta - __cur.viewNet;
-            if (__cur.tag && __cur.tag.startsWith("Invest_"))
-            {
+            if (__cur.tag && __cur.tag.startsWith("Invest_")) {
                 let txfBuy = _.filter(txf2, tx => tx.trade == "buy");
                 let mapped = _.map(txfBuy, tx => [tx.amount, tx.rate]);
-                let sum = 0; let amount = 0;
-                txfBuy.forEach(tx => { 
+                let sum = 0;
+                let amount = 0;
+                txfBuy.forEach(tx => {
                     let _rate = (!tx.dst_amount || !tx.amount) ? 1.0 : tx.dst_amount / tx.amount;
                     sum += tx.amount * _rate;
-                    amount += tx.amount;})
-                __cur.avgRateBuy = amount/sum;
+                    amount += tx.amount;
+                })
+                __cur.avgRateBuy = amount / sum;
 
                 let txfSell = _.filter(txf2, tx => tx.trade == "sell");
-                sum = 0; amount = 0;
+                sum = 0;
+                amount = 0;
                 txfSell.forEach(tx => {
                     let _rate = (!tx.dst_amount || !tx.amount) ? 1.0 : tx.dst_amount / tx.amount;
                     sum += tx.amount * _rate;
-                    amount += tx.amount;});
-                __cur.avgRateSell = sum/amount;
+                    amount += tx.amount;
+                });
+                __cur.avgRateSell = sum / amount;
             }
 
             //5. SORT TAGS AND CALCULATE BUDGETS
@@ -901,12 +903,12 @@ let vm = new Vue({
                 tx.date = new Date();
             else if (typeof tx.date == "string")
                 tx.date = new Date(tx.date);
-            
+
             tx.date.setHours(3);
             tx.date.setMinutes(0);
             tx.date.setSeconds(0);
             tx.date.setMilliseconds(+tx.f41_id * 1000);
-            if (!tx.order || Math.floor(tx.order/100)*100 != this.store.ymd(tx.date))
+            if (!tx.order || Math.floor(tx.order / 100) * 100 != this.store.ymd(tx.date))
                 this.store.order(tx);
 
             if (!tx.created)
@@ -915,7 +917,7 @@ let vm = new Vue({
             tx.year = tx.date.getFullYear();
             tx.month = tx.date.getMonth();
             tx.tag = tx.tag.trim();
-            
+
             //проверка на новый тэг
             if (tx.tag && !this.store.base_tag(tx.tag)) {
                 let nTag = this.newTag(tx.tag);
@@ -928,7 +930,7 @@ let vm = new Vue({
          * save a modified transaction
          * @param tx
          */
-        saveTx(tx) {
+        async saveTx(tx) {
             let ntx = tx;
 
             if (!this.validateTx(ntx)) {
@@ -941,171 +943,158 @@ let vm = new Vue({
             let ntx_clone = _.clone(ntx, true);
             delete ntx_clone.__v;
 
-            axios.put(`${$server.BASE_URL}/api/money/tx`, ntx_clone).then(
-                response => {
-                    Vue.set(ntx, 'isEdited', false);
-                    this.calcAll();
-                    this.showMonth();
-                    this.success(`tx id = ${tx.f41_id} updated in DB`, "saveTx");
-                },
-                response => {
-                    this.error(`Error while saving tx ${tx.f41_id}`, response, "saveTx");
-                }
-            )
+            try {
+                await axios.put(`${$server.BASE_URL}/api/money/tx`, ntx_clone);
+                this.$set(ntx, 'isEdited', false);
+                this.calcAll();
+                this.showMonth();
+                this.success(`tx id = ${tx.f41_id} updated in DB`, "saveTx");
+            } catch (err) {
+                this.error(`Error while saving tx ${tx.f41_id}`, response, "saveTx");
+            }
         },
 
         /**
          * add a new transaction
          * @param tx
          */
-        addTx(tx) {
+        async addTx(tx) {
             let ntx = tx;
-
             if (!this.validateTx(ntx)) {
                 toastr.warning("Please correct errors");
                 return;
             }
-
             this.prepareTx(ntx);
 
-            axios.post(`${$server.BASE_URL}/api/money/tx`, ntx).then(
-                response => {
-                    let nTx = ntx;
-                    nTx._id = response.data._id;
-                    this.store.transactions.push(nTx);
-                    this.calcAll();
-                    this.showMonth();
-                    $bus.$emit("tx-saved-ok");
-                    this.success(`new tx id = ${ntx.f41_id} added to DB`, 'addTx');
-                },
-                response => {
-                    this.error(`Error while adding new tx id = ${ntx.f41_id}`, response, 'addTx');
-                }
-            )
+            try {
+                const response = await axios.post(`${$server.BASE_URL}/api/money/tx`, ntx);
+                ntx._id = response.data._id;
+                this.store.transactions.push(ntx);
+                this.calcAll();
+                this.showMonth();
+                $bus.$emit("tx-saved-ok");
+                this.success(`new tx id = ${ntx.f41_id} added to DB`, 'addTx');
+            } catch (err) {
+                this.error(`Error while adding new tx id = ${ntx.f41_id}`, err, 'addTx');
+            }
         },
 
         /**
          * remove a transaction
          * @param tx
          */
-        removeTx(tx) {
-            axios.delete(`${$server.BASE_URL}/api/money/tx/${tx._id}`).then(
-                response => {
-                    this.store.transactions = _.reject(this.store.transactions, _tx => _tx._id == tx._id);
-                    this.calcAll();
-                    this.showMonth();
-                    $bus.$emit("tx-removed-ok");
-                    this.success(`tx id = ${tx.f41_id} removed`, 'removeTx');
-                },
-                response => {
-                    this.error(`Error while removing tx id = ${tx.f41_id}`, response, 'removeTx');
-                }
-            );
+        async removeTx(tx) {
+            try {
+                await axios.delete(`${$server.BASE_URL}/api/money/tx/${tx._id}`);
+                this.store.transactions = _.reject(this.store.transactions, _tx => _tx._id == tx._id);
+                this.calcAll();
+                this.showMonth();
+                $bus.$emit("tx-removed-ok");
+                this.success(`tx id = ${tx.f41_id} removed`, 'removeTx');
+            } catch (err) {
+                this.error(`Error while removing tx id = ${tx.f41_id}`, err, 'removeTx');
+            }
         },
 
         /**
          * add new pinned tag
          * @param pt
          */
-        addTag(bt) {
-            axios.post(`${$server.BASE_URL}/api/money/tags`, bt).then(
-                response => {
-                    bt._id = response.data._id;
-                    this.store.base_tags.push(bt);
-                    this.success(`successfully saved tag ${bt.name}`, 'addTag');
-                },
-                response => {
-                    this.error(`Error while saving tag ${bt.name}`, response, 'addTag');
-                }
-            )
+        async addTag(bt) {
+            try {
+                const response = await axios.post(`${$server.BASE_URL}/api/money/tags`, bt);
+                bt._id = response.data._id;
+                this.store.base_tags.push(bt);
+                this.success(`successfully saved tag ${bt.name}`, 'addTag');
+            } catch (err) {
+                this.error(`Error while saving tag ${bt.name}`, err, 'addTag');
+            }
         },
 
         /**
          * save (modified) base tag
          * @param pt
          */
-        saveTag(bt) {
+        async saveTag(bt) {
             if (!bt.name) {
                 toastr.warning("Empty tag not allowed");
                 return;
             }
-            axios.put(`${$server.BASE_URL}/api/money/tags`, bt).then(
-                response => {
-                    this.calcAll();
-                    this.showMonth();
-                    this.store.cur.tags.forEach((tag) => {
-                        if (tag.name === bt.name) {
-                            Vue.set(tag, 'isEdited', false);
-                        }
-                    });
-                    this.success(`Successfully saved base tag ${bt.name}`, 'saveTag');
-                },
-                response => {
-                    this.error(`Error while saving base tag ${bt.name}`, response, 'saveTag');
-                }
-            )
-        },
-
-        removeTag(bt) {
-            axios.delete(`${$server.BASE_URL}/api/money/tags/${bt._id}`).then(
-                response => {
-                    this.store.base_tags = _.reject(this.store.base_tags, _bt => _bt.name == bt.name);
-                    this.calcAll();
-                    this.showMonth();
-                    this.success(`tag ${bt.name} was removed successfully`, 'removeTag');
-                },
-                response => {
-                    this.error(`Error while removing tag ${bt.name}`, response, 'removeTag')
-                }
-            )
-        },
-
-        renameTag(opt) {
-            axios.post(`${$server.BASE_URL}/api/money/tags/rename`, opt).then(
-                response => {
-                    this.store.transactions.forEach(tx => {
-                        if (tx.tag == opt.oldName)
-                            tx.tag = opt.newName;
-                    });
-                    this.calcAll();
-                    this.showMonth();
-                    this.success(`Base tag ${opt.oldName} successfully renamed to ${opt.newName}`, 'renameTag');
-                },
-                response => {
-                    this.error(`Error while renaming base tag ${opt.oldName}`, response, "renameTag");
-                }
-            )
-        },
-
-        renameAcc(opt) {
-            axios.post(`${$server.BASE_URL}/api/money/accounts/rename`, opt).then(
-                response => {
-                    this.store.transactions.forEach(tx => {
-                        if (tx.src == opt.oldName)
-                            tx.src = opt.newName;
-                        if (tx.dst = opt.oldName)
-                            tx.dst = opt.newName;
-                    });
-                    this.calcAll();
-                    this.showMonth();
-                    this.success(`Account ${opt.oldName} successfully renamed to ${opt.newName}`, 'renameAcc');
-                },
-                response => {
-                    this.error(`Error while renaming txs account from ${opt.oldName} to ${opt.newName}`, response, 'renameAcc');
-                }
-            )
-        },
-
-        saveAcc(acc) {            
-            axios.put(`${$server.BASE_URL}/api/money/accounts`, acc).then(
-                response => {
-                    this.success(`Account ${acc.name} was saved`, 'saveAcc');
-                },
-                response => {
-                    this.error(`Error while saving account ${acc.name}`, response, 'saveAcc');
+            try {
+                await axios.put(`${$server.BASE_URL}/api/money/tags`, bt);
+                this.calcAll();
+                this.showMonth();
+                this.store.cur.tags.forEach((tag) => {
+                    if (tag.name === bt.name) {
+                        Vue.set(tag, 'isEdited', false);
+                    }
                 });
-        }
-    },
+                this.success(`Successfully saved base tag ${bt.name}`, 'saveTag');
+            } catch (err) {
+                this.error(`Error while saving base tag ${bt.name}`, err, 'saveTag');
+            }
+        },
 
-    filters: $store.filters
+        async removeTag(bt) {
+            try {
+                await axios.delete(`${$server.BASE_URL}/api/money/tags/${bt._id}`);
+                this.store.base_tags = _.reject(this.store.base_tags, _bt => _bt.name == bt.name);
+                this.calcAll();
+                this.showMonth();
+                this.success(`tag ${bt.name} was removed successfully`, 'removeTag');
+            } catch (err) {
+                this.error(`Error while removing tag ${bt.name}`, err, 'removeTag')
+            }
+        },
+
+        async renameTag(opt) {
+            try {
+                await axios.post(`${$server.BASE_URL}/api/money/tags/rename`, opt);
+                this.store.transactions.forEach(tx => {
+                    if (tx.tag == opt.oldName)
+                        tx.tag = opt.newName;
+                });
+                this.calcAll();
+                this.showMonth();
+                this.success(`Base tag ${opt.oldName} successfully renamed to ${opt.newName}`, 'renameTag');
+            } catch (err) {
+                this.error(`Error while renaming base tag ${opt.oldName}`, err, "renameTag");
+            }
+        },
+
+        /**
+         * renaming an account
+         * @param {*} opt 
+         */
+
+        async renameAcc(opt) {
+            try {
+                await axios.post(`${$server.BASE_URL}/api/money/accounts/rename`, opt);
+                this.store.transactions.forEach(tx => {
+                    if (tx.src == opt.oldName)
+                        tx.src = opt.newName;
+                    if (tx.dst = opt.oldName)
+                        tx.dst = opt.newName;
+                });
+                this.calcAll();
+                this.showMonth();
+                this.success(`Account ${opt.oldName} successfully renamed to ${opt.newName}`, 'renameAcc');
+            } catch (err) {
+                this.error(`Error while renaming txs account from ${opt.oldName} to ${opt.newName}`, err, 'renameAcc');
+            }
+        },
+
+        /**
+         * saving an account
+         * @param {*} acc 
+         */
+        async saveAcc(acc) {
+            try {
+                await axios.put(`${$server.BASE_URL}/api/money/accounts`, acc)
+                this.success(`Account ${acc.name} was saved`, 'saveAcc');
+            } catch (err) {
+                this.error(`Error while saving account ${acc.name}`, err, 'saveAcc');
+            };
+        }
+    }
 });

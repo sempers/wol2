@@ -3,12 +3,15 @@ let $store = {
 
 	name: $server.NAME,
 
-	//объекты компонентов после маунтинга
 	weeks: [],
 
 	years: {},
 
 	firstYearPlaceHolderWidth: 0,
+
+	test: {
+		wiTimes: []
+	},
 
 	tags: {
 		stats: [],
@@ -48,18 +51,11 @@ let $store = {
 	shownEditDialog: false,
 	shownMapDialog: false,
 	shownMessageDialog: false,
+	shownPillsDialog: false,
 
 	curMsgTab: 0,
 
 	curTag: "",
 
 	googleMapsLoaded: false,
-
-	filters: {
-		fmtDate(date) {
-			return moment(date).local().format('DD.MM.YYYY HH:mm:ss');
-		}
-	}
 };
-
-var $bus = new Vue();

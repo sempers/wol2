@@ -1,3 +1,5 @@
+/* #ef5350;*/
+/* #26a69a;*/
 body {
   font-family: "RobotoDraft", "Roboto", sans-serif;
   background-color: inherit;
@@ -59,7 +61,7 @@ a:focus {
   color: #222;
 }
 .amount.transfer {
-  color: #0E64BA;
+  color: #0e64ba;
 }
 .amount.mini {
   font-size: 0.85em;
@@ -79,7 +81,7 @@ a:focus {
 }
 .bevel,
 .bevel a {
-  color: #444;
+  color: #222;
   text-shadow: 0 1px 0 #F3F3F3;
 }
 .rate-profit {
@@ -206,7 +208,7 @@ a:focus {
 .txlist-header {
   background-color: #fafafa;
   padding: 9px 10px 12px 7px;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid #eee;
   height: 48px;
   box-sizing: border-box;
   vertical-align: middle;
@@ -286,9 +288,7 @@ a:focus {
   background-color: #f0f0ff;
 }
 .tx-item .tx-tags-text {
-  /* background-color: white; */
   position: relative;
-  /* left: -1px; */
   float: left;
 }
 .tx-item .tx-tags-text-blank {
@@ -352,8 +352,8 @@ a:focus {
   color: green;
 }
 .tx-item .tx-trade-icon.sell {
-  border-color: red;
-  color: red;
+  border-color: #E72020;
+  color: #E72020;
 }
 .tx-rate {
   margin-top: 16px;
@@ -459,7 +459,7 @@ a:focus {
   color: #E72020;
 }
 .tag-budget.transfer {
-  color: #0E64BA;
+  color: #0e64ba;
 }
 .tag-name {
   float: left;

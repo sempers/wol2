@@ -23,7 +23,8 @@ export default {
 		info: "",
 		index: -1,
 		weekNum: -1,
-		colored_flags: []
+		colored_flags: [],
+		messages: []
 	},
 
 	curMessages: [],
@@ -48,6 +49,7 @@ export default {
 	shownEditDialog: false,
 	shownMapDialog: false,
 	shownMessageDialog: false,
+	shownPillsDialog: false,
 
 	curMsgTab: 0,
 
@@ -56,11 +58,5 @@ export default {
 	map: [],
 
 	googleMapsLoaded: false,
-
-	filters: {
-		fmtDate(date) {
-			return moment(date).local().format('DD.MM.YYYY HH:mm:ss');
-		}
-	}
 };
 

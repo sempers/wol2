@@ -315,8 +315,6 @@ var $store = {
 
 };
 
-let $bus = new Vue();
-
 Vue.filter('fmtAmount', (amount, options) => {
     options = options || {};
 

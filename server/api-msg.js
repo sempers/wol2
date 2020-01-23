@@ -1,10 +1,7 @@
-const util = require("util");
 const _    = require("underscore");
-const os   = require('os');
 let db     = require("./db");
 const config = require("./config");
 
-let _obj     = require('./utils')._obj;
 let _endPost = require("./endReq")();
 
 //html
@@ -37,7 +34,7 @@ function getChatStats(req, res) {
         if (err) {
             res.json(err);
         } else {
-            res.json(docs.map(_obj));
+            res.json(docs.map(doc => doc.toObject()));
         }
     });
 }
@@ -55,7 +52,7 @@ function getRules(req, res) {
         if (err)
             res.json(err);
         else
-            res.json(docs.map(_obj));
+            res.json(docs.map(doc => doc.toObject()));
     });
 }
 
@@ -76,7 +73,7 @@ function correctChats(req, res) {
     db.MessagesRules.find({}, function (err, rules) {
         if (err)
             throw err;
-        let _rules   = rules.map(_obj);
+        let _rules   = rules.map(doc => doc.toObject());
         let _matches = _rules.map(o => o.match);
 
         db.Messages.find({"chat": {"$in": _matches}}, function (err, docs) {
@@ -134,7 +131,7 @@ function getChat(req, res) {
     .sort({date: 1})
     .exec((err, docs) => {
         if (!err && docs) {
-            res.json(docs.map(_obj));
+            res.json(docs.map(doc => doc.toObject()));
         } else {
             res.json([err]);
         }
@@ -153,7 +150,7 @@ function getWeekMessages(req, res) {
     .sort({date: 1})
     .exec((err, docs) => {
         if (!err && docs) {
-            let grouped = _.groupBy(docs.map(_obj), (d) => d.chat);
+            let grouped = _.groupBy(docs.map(doc => doc.toObject()), (d) => d.chat);
             let sorted  = _.sortBy(Object.keys(grouped).map((key) => {
                 return {chat: key, messages: grouped[key]};
             }), (c) => -c.messages.length);

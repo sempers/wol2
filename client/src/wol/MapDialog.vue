@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import $store from "../store.js"
-import $bus from "../../bus.js"
+import $store from "./store.js"
+import $bus from "../bus.js"
 
 export default {
 	data() {

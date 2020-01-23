@@ -1,36 +1,54 @@
 Vue.component("WeekItem", {
     props: ['week'],
 
-    computed: {
-        tags() {
-            return this.week.getTags({stripped: true, asstring: true});
+    data() {
+        return {
+            mounted: false,
+            created: 0,
+            updated: 0,
         }
     },
 
-    template: `<div class='wi' :class='{selected: week.selected, infoed: !!week.info, tagged: week.tagged}' @click='onClick()' >
-				<div class='wi-inner' :class='week.future'>
-					<div class="wi-bg" :style="{'background-color': week.bgcolor}"></div>
-					<div class="wi-bg2" :style="{'border-bottom': '12px solid '+ week.bgcolor2}" v-if="week.bgcolor2 && !week.future"></div>
-					<div class='wi-icon' :class='tags'></div>
-                    <div class='wi-popup-tri' ></div>
-                    <div class='wi-popup md-elevation-3' >
-                        <span class='desc-desc' v-once>{{week.desc}}</span>&nbsp;
-                        <div class='desc-flags' v-once>{{week.flags}}</div><br/>
-                        <div class='desc-info'>{{week.info}}</div>
-                    </div>
-				</div>
-			   </div>`,
+    computed: {
+        tags() {
+            return this.week.getTags({
+                stripped: true,
+                asstring: true
+            });
+        }
+    },
+
+    template: `
+        <div class="wi-outer" :class="{selected: week.selected, infoed: !!week.info, tagged: week.tagged}" @click="onClick()">
+            <div class="wi-inner" :class="week.future">
+                <template v-if="!week.future">
+                    <div class="wi-bg" :style="'background-color:' + week.bgcolor"></div>
+                    <div class="wi-bg2" :style="'border-bottom: 12px solid '+ week.bgcolor2" v-if="week.bgcolor2"></div>
+                    <div class='wi-icon' :class="tags"></div>
+                </template>
+                <div class="wi-popup-triangle"></div>
+                <div class="wi-popup md-elevation-4" >
+                    <span class="desc" >{{week.desc}}</span>&nbsp;
+                    <div  class="desc-flags" >{{week.flags}}</div>
+                    <div  class="desc-info">{{week.info}}</div>
+                </div>
+            </div>
+        </div>
+        `,
 
     methods: {
         onClick() {
-            this.$emit("week-clicked", this.week)
+            this.$emit("week-clicked", this.week);
         }
     },
 
+    created() {
+        this.$emit("week-created", this.week);
+        this.created = (new Date()).getTime();
+    },
+
     mounted() {
-        if (!this.mounted) {
-            this.$emit("week-mounted", this.week);
-        }
+        $bus.$emit("wit", (new Date()).getTime() - this.created);
     }
 });
 
@@ -38,12 +56,12 @@ Vue.component("MapDialog", {
     data() {
         return {
             store: $store
-        };
+        }
     },
     template: `
 		<md-dialog id="mapDialog" :md-active.sync='store.shownMapDialog'>
 			<md-dialog-content>
-				<div id="map" />
+				<div id="map" ></div>
 			</md-dialog-content>
 			<md-dialog-actions>
 				<md-button @click='store.shownMapDialog = false'>Закрыть</md-button>
@@ -63,7 +81,11 @@ Vue.component("EditDialog", {
     computed: {
         tagicons() {
             if (this.store.curWeek.getTags)
-                return this.store.curWeek.getTags({stripped: true, asstring: false, hasPng: true});
+                return this.store.curWeek.getTags({
+                    stripped: true,
+                    asstring: false,
+                    hasPng: true
+                });
             else
                 return [];
         }
@@ -111,7 +133,7 @@ Vue.component("EditDialog", {
 
     mounted() {
         $bus.$on("curweek-changed", this.adjustArea);
-        let device = (new UAParser()).getDevice();
+        const device = (new UAParser()).getDevice();
         this.isMobile = device && (device.type == 'mobile' || device.type == 'tablet');
     },
 
@@ -131,26 +153,26 @@ Vue.component("EditDialog", {
         },
 
         adjustArea() {
-            Vue.nextTick(() => {
-                let el = document.getElementById("week_info_textarea");
+            this.$nextTick(() => {
+                const el = document.getElementById("week_info_textarea");
                 if (el) {
                     el.style.height = "1px";
                     el.style.height = `${Math.round(el.scrollHeight) + 6}px`;
                 }
-            });            
+            });
         },
 
         goPrevious() {
-            if (this.store.curWeek.weekNum > 1)            
-                this.$emit("prev-week");
+            if (this.store.curWeek.weekNum > 1)
+                $bus.$emit("prev-week");
         },
 
         goNext() {
-            this.$emit("next-week");
+            $bus.$emit("next-week");
         },
 
         onSave(exit) {
-            this.$emit("week-saved");
+            $bus.$emit("week-saved");
             if (exit) {
                 this.store.shownEditDialog = false;
             }
@@ -158,7 +180,7 @@ Vue.component("EditDialog", {
 
         onShowMessages() {
             if (this.store.curWeek.messages.length)
-                this.$emit("show-messages", this.store.curWeek.messages);
+                $bus.$emit("show-messages", this.store.curWeek.messages);
         }
     }
 });
@@ -167,8 +189,11 @@ Vue.component("MessageDialog", {
     data() {
         return {
             store: $store,
-            curChat: {messages: [], chat: ""}
-        };
+            curChat: {
+                messages: [],
+                chat: ""
+            }
+        }
     },
 
     template: `
@@ -212,7 +237,7 @@ Vue.component("MessageDialog", {
           </md-dialog-content>
 	    </md-dialog>
     `,
-    
+
     methods: {
         showChat(chat) {
             this.curChat = chat;
@@ -220,13 +245,142 @@ Vue.component("MessageDialog", {
         },
 
         clearCurChat() {
-            this.curChat = { messages: [], chat:""}
+            this.curChat = {
+                messages: [],
+                chat: ""
+            }
         }
     },
 
     mounted() {
         $bus.$on("curweek-changed", this.clearCurChat);
+    }
+});
+
+Vue.component('PillsDialog', {
+    data() {
+        return {
+            store: $store,
+            obj: {
+                lastSave: null,
+                pills: []
+            }
+        }
     },
 
-    filters: $store.filters
+    template: `
+        <md-dialog id="pillsDialog" :md-active.sync="store.shownPillsDialog">
+            <md-dialog-content>
+                <div class="ib">Последний пересчет: {{obj.lastSave | fmtDate}}</div>
+                <md-button class="md-icon-button md-dense action-btn" @click="close()">
+                    <md-icon>clear</md-icon>
+                </md-button>
+                <md-button class="md-icon-button md-dense action-btn" @click="save()">
+                    <md-icon>done</md-icon>
+                </md-button>
+                <md-table class="pills-table">
+                    <md-table-row>
+                        <md-table-head>Препарат</md-table-head>
+                        <md-table-head>1 таб (мг)</md-table-head>
+                        <md-table-head>Доза (мг)</md-table-head>
+                        <md-table-head>Количество</md-table-head>
+                        <md-table-head>Закончится</md-table-head>
+                    </md-table-row>
+                    <md-table-row v-for="pill in obj.pills" :key="pill.name">
+                        <md-table-cell >{{pill.name}}</md-table-cell>
+                        <md-table-cell >{{pill.unit}}</md-table-cell>
+                        <md-table-cell >{{pill.dose}}</md-table-cell>
+                        <md-table-cell ><input type="text" v-model="pill.available" /></md-table-cell>
+                        <md-table-cell >{{pill.finish}}</md-table-cell>
+                    </md-table-row>
+                </md-table>
+            </md-dialog-content>
+        </md-dialog>
+    `,
+
+    created() {
+        var obj = JSON.parse(localStorage.getItem('wol_pills_obj'));
+        if (!obj || !obj.lastSave) {
+            //default
+            obj = {
+                lastSave: new Date(),
+                pills: [
+                    {
+                        name: 'Арипипразол',
+                        unit: 10,
+                        dose: 10,
+                        available: 30
+                    },
+                    {
+                        name: 'Сертралин',
+                        unit: 100,
+                        dose: 200,
+                        available: 30
+                    },
+                    {
+                        name: 'Биперидин',
+                        unit: 2,
+                        dose: 2,
+                        available: 100
+                    },
+                    {
+                        name: 'Ламотриджин',
+                        unit: 100,
+                        dose: 300,
+                        available: 30
+                    },
+                    {
+                        name: 'Вальпроевая кислота',
+                        unit: 300,
+                        dose: 300,
+                        available: 100
+                    },
+                    {
+                        name: 'Тразодон',
+                        unit: 150,
+                        dose: 75,
+                        available: 30
+                    },
+                    {
+                        name: 'Вортиоксетин',
+                        unit: 10,
+                        dose: 10,
+                        available: 30
+                    }
+                ]
+            };
+            localStorage.setItem('wol_pills_obj', JSON.stringify(obj));
+        }
+        this.obj = obj;
+        this.count();
+    },
+
+    methods: {
+        count() {
+            this.obj.pills.forEach(pill => {
+                let diffDays = Math.abs(Math.floor(moment(this.obj.lastSave).diff(moment(new Date()), 'days')));
+                pill.available -= (pill.dose / pill.unit) * diffDays;
+                if (pill.available < 0 )
+                    pill.available = 0;
+                let days = Math.floor(pill.available * pill.unit / pill.dose);
+                let ls = moment(this.obj.lastSave);
+                ls.add(days, 'day');
+                pill.finish = ls.local().format('D MMMM YYYY');
+                this.obj.lastSave = new Date();
+                LOG('count()', `Pills recounted at ${this.obj.lastSave}`)
+            });
+        },
+
+        close() {
+            this.count();
+            localStorage.setItem('wol_pills_obj', JSON.stringify(this.obj));
+            this.store.shownPillsDialog = false;
+        },
+
+        save() {
+            this.count();
+            localStorage.setItem('wol_pills_obj', JSON.stringify(this.obj));
+            toastr.success('Pills saved');
+        }
+    }
 });

@@ -12,11 +12,12 @@ const cons = require('consolidate')
     , api_msg = require('./api-msg')
     , api_travel = require('./api-travel');
 
-var app = express();
+
+const app = express();
 
 app.engine("html", cons.ejs);
 app.set('view engine', 'html');
-app.set("views", path.resolve(__dirname, '../client'));
+app.set("views", path.resolve(__dirname, '../client/app'));
 app.set('trust proxy', 1);
 
 app.use(express.static(path.resolve(__dirname, '../client'), {
@@ -32,9 +33,6 @@ app.use(cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000
 }));
 
-//render server values
-app.get("/lib/server.js", api_wol.renderServerParams);
-
 //html
 app.get("/wol", api_wol.renderWol);
 app.get("/login", api_wol.renderLogin);
@@ -48,27 +46,30 @@ app.get("/:name", api_wol.renderWol);
 //wol
 app.get("/api/wol/weeks", api_wol.getWeeks);
 app.post("/api/wol/weeks",  api_wol.saveWeek);
+
 //travel
 app.get("/api/travels", api_travel.getTravels);
-app.post("/api/travels", api_travel.saveTravel);
+app.post("/api/travels",  api_travel.saveTravel);
 app.delete("/api/travels/:_id", api_travel.removeTravel);
+
 //money
 app.get("/api/money/rates", api_money.mwRates, api_money.getRates);
 app.get("/api/money/histRates", api_money.getHistRates);
 app.get("/api/money/currentRates", api_money.getCurrentRates);
 app.get("/api/money/saveCurrentRates", api_money.saveCurrentRates); //test
-app.post("/api/money/tx",  api_money.addTx);
-app.put("/api/money/tx",  api_money.saveTx);
+app.post("/api/money/tx", api_money.addTx);
+app.put("/api/money/tx", api_money.saveTx);
 app.delete("/api/money/tx/:_id", api_money.removeTx);
-app.post("/api/money/tags",  api_money.addPt);
-app.put("/api/money/tags",  api_money.savePt);
-app.post("/api/money/tags/rename",  api_money.renamePt);
+app.post("/api/money/tags", api_money.addPt);
+app.put("/api/money/tags", api_money.savePt);
+app.post("/api/money/tags/rename", api_money.renamePt);
 app.delete("/api/money/tags/:_id", api_money.removePt);
-app.post("/api/money/accounts",  api_money.addAcc);
-app.post("/api/money/accounts/rename",  api_money.renameAcc);
-app.put("/api/money/accounts",  api_money.saveAcc);
-app.post("/api/money/rates",  api_money.saveRates);
+app.post("/api/money/accounts", api_money.addAcc);
+app.post("/api/money/accounts/rename", api_money.renameAcc);
+app.put("/api/money/accounts", api_money.saveAcc);
+app.post("/api/money/rates", api_money.saveRates);
 app.get("/api/money", api_money.mwRates, api_money.getMoney);    //allInfo
+
 //messages
 app.get("/api/msg/chats", api_msg.getMsgsByChats);
 app.get("/api/msg/chats_stats", api_msg.getChatStats);
@@ -88,6 +89,6 @@ app.get("/", api_wol.renderWol);
 
 db.connect();
 
-let httpPort = process.env.PORT || 3000;
-let server = http.createServer(app).listen(httpPort, () => console.log(`WoL HTTP server [for name ${process.env.NAME}] is working on port ${httpPort}`));
+const httpPort = process.env.PORT || 3000;
+const server = http.createServer(app).listen(httpPort, () => console.log(`WoL server [for name: ${process.env.NAME}] is working on port ${httpPort}`));
 server.setTimeout(30 * 60 * 1000);

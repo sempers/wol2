@@ -55,10 +55,6 @@ Vue.component("balance", {
 
         btc_amount() {
             return this.store.convert(this.amount, this.currency, "BTC");
-        },
-
-        eth_amount() {
-            return this.store.convert(this.amount, this.currency, "ETH");
         }
     },
 
@@ -120,7 +116,6 @@ Vue.component("cat-icon", {
                     return ["fab", "fa-ethereum"];
                 case "BNB":
                     return ["fab", "fa-bnb"];
-
             }
 
             switch (this.category) {
@@ -308,7 +303,7 @@ Vue.component("tx-item", {
             }
             if (this.store.is_acc_current(this.tx.dst)) {
                 return this.tx.dst_amount;
-            }
+            } 
         },
 
         balance() {
@@ -719,7 +714,6 @@ Vue.component("stats-list", {
     }
 });
 
-
 Vue.component("tx-form", {
     data() {
         return {
@@ -813,14 +807,17 @@ Vue.component("tx-form", {
             <md-input name="desc" v-model="ntx.desc"/>
         </md-field>
     </div>
-    <div class="md-layout-item" style="max-width:130px">
+    <div class="md-layout-item" style="max-width:130px;margin-left:20px">
         <md-autocomplete class="mb0" name="src" v-model="ntx.src" :md-options="accounts" md-dense>
             <label v-if="ntx.type != 'transfer'">Счет</label>
             <label v-else>Откуда</label>
         </md-autocomplete>
-        <md-autocomplete name="dst" v-model="ntx.dst" v-if="ntx.type=='transfer'" :md-options="accounts" md-dense>
+        <md-autocomplete  style="margin-top:0" name="dst" v-model="ntx.dst" v-if="ntx.type=='transfer'" :md-options="accounts" md-dense>
             <label>Куда</label>
         </md-autocomplete>
+        <md-button class="md-icon-button md-dense" v-if="ntx.type=='transfer'" @click="swapFromTo()" style="margin:0;position:relative;top:-75px;left:-35px;">
+            <md-icon>repeat</md-icon>
+        </md-button>
     </div>
     <div class="md-layout-item">
         <md-datepicker name="date" v-model="ntx.date" md-immediately></md-datepicker>
@@ -871,6 +868,12 @@ Vue.component("tx-form", {
             if (n.type === "transfer" && n.src && n.dst && $s.acc(n.src) && $s.acc(n.dst) && $s.acc_currency(n.dst) === $s.acc_currency(n.src)) {
                 this.ntx.dst_amount = value;
             }
+        },
+
+        swapFromTo() {
+            let swap = this.ntx.src;
+            this.ntx.src = this.ntx.dst;
+            this.ntx.dst = swap;
         },
 
         modTag(tag) {
@@ -1032,6 +1035,7 @@ Vue.component("pinned-tags-list", {
             store: $store
         };
     },
+    
     template: `
     <div id="right-col">
         <div id="right-col-header" class="item" >
@@ -1103,7 +1107,6 @@ Vue.component("rate-item", {
         },
 
         rateSecondary() {
-            let now_ym = this.store.ym((new Date()).getFullYear(), (new Date()).getMonth());
             if (this.item.sym2 == "RUB" || !this.item.avg_entrance) {
                 return null;
             } else {

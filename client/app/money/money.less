@@ -1,3 +1,11 @@
+@red: #E72020; /* #ef5350;*/
+@green: green; /* #26a69a;*/
+@blue: #0e64ba;
+@litegray: #eee;
+@darkgray: darkgray;
+@active-gray: #d0d0d0;
+@black: #222;
+
 body {
     font-family: "RobotoDraft", "Roboto", sans-serif;
     background-color: inherit;
@@ -15,7 +23,7 @@ a:focus {
 /*LAYOUT*/
 #money-header {
     width: 100%;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid @litegray;
 }
 
 #money-main {
@@ -28,7 +36,7 @@ a:focus {
 /* AMOUNTS */
 .secondary-amount {
     float: right;
-    color: darkgray !important;
+    color: @darkgray !important;
     font-size: 11px !important;
     padding-right: 13px;
     clear: both;
@@ -46,7 +54,7 @@ a:focus {
 }
 .secondary-rate {
     float: right;
-    color: darkgray !important;
+    color: @darkgray !important;
     font-size: 11px !important;
     padding-right: 13px;
     clear: both;
@@ -60,19 +68,19 @@ a:focus {
     display: inline-block;
 
     &.income {
-        color: green;
+        color: @green;
     }
 
     &.expense {
-        color: #E72020;
+        color: @red;
     }
 
     &.balance {
-        color: #222;
+        color: @black;
     }
 
     &.transfer {
-        color: #0E64BA;
+        color: @blue;
     }
 
     &.mini {
@@ -81,7 +89,7 @@ a:focus {
     }
 
     .balance_reset {
-        color: #222;
+        color: @black;
     }
 }
 
@@ -99,7 +107,7 @@ a:focus {
 
 .bevel,
 .bevel a {
-    color: #444;
+    color: @black;
     text-shadow: 0 1px 0 #F3F3F3;
 }
 
@@ -135,11 +143,11 @@ a:focus {
 
     &.active {
         font-weight: bold;
-        background-color: #d0d0d0;
+        background-color: @active-gray;
     }
 
     &:hover:not(.active) {
-        background-color: #d0d0d0;
+        background-color: @active-gray;
     }
 }
 
@@ -205,7 +213,7 @@ a:focus {
 
     &.active {
         font-weight: bold;
-        background-color: #d0d0d0;
+        background-color: @active-gray;
     }
 
     &:hover:not(.active) {
@@ -252,7 +260,7 @@ a:focus {
 .txlist-header {
     background-color: #fafafa;
     padding: 9px 10px 12px 7px;
-    border-bottom: 1px solid #eeeeee;
+    border-bottom: 1px solid #eee;
     height: 48px;
     box-sizing: border-box;
     vertical-align: middle;
@@ -273,13 +281,13 @@ a:focus {
 }
 
 .txlist-list {
-    border-left: 1px solid #eee;
-    border-right: 1px solid #eee;
+    border-left: 1px solid @litegray;
+    border-right: 1px solid @litegray;
 }
 
 .tx-item {
     width: 100%;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid @litegray;
     display: block;
     padding: 0;
     cursor: pointer;
@@ -352,9 +360,7 @@ a:focus {
 
 .tx-item {
     .tx-tags-text {
-        /* background-color: white; */
         position: relative;
-        /* left: -1px; */
         float: left;
     }
 
@@ -422,13 +428,13 @@ a:focus {
         opacity: 0.8;
 
         &.buy {
-            border-color: green;
-            color:green;
+            border-color: @green;
+            color:@green;
         }
 
         &.sell {
-            border-color: red;
-            color: red;
+            border-color: @red;
+            color: @red;
         }
     }
 }
@@ -486,7 +492,7 @@ a:focus {
 
     &.active {
         font-weight: bold;
-        background-color: #d0d0d0;
+        background-color: @active-gray;
     }
 
     &.disabled {
@@ -540,7 +546,7 @@ a:focus {
     padding: 2px 2px 0 8px;
     opacity: 0.8;
     box-sizing: border-box;
-    border: 1px solid #eee;
+    border: 1px solid @litegray;
     border-radius: 8px;
     position: relative;
     top: -2px;
@@ -550,15 +556,15 @@ a:focus {
     }
 
     &.income {
-        color: green;
+        color: @green;
     }
 
     &.expense {
-        color: #E72020;
+        color: @red;
     }
     
     &.transfer {
-        color: #0E64BA;
+        color: @blue;
     }
 }
 
@@ -743,7 +749,7 @@ path.line {
 }
 
 .data1 {
-    stroke: green;
+    stroke: @green;
 }
 
 .data2 {
@@ -795,7 +801,7 @@ div.tooltip {
     display: inline-block;
     padding: 6px;
     font: 11px monospace;
-    background: #eee;
+    background: @litegray;
     border: 1px solid #ccc;
     border-radius: 4px;
     pointer-events: none;
@@ -879,10 +885,6 @@ div.tooltip {
     float: right;
     display: inline-flex;
     margin: 0;
-}
-
-.legend {
-    
 }
 
 .txlist-below {

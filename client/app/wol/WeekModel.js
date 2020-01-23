@@ -2,12 +2,10 @@
 class WeekModel {
     allowedPNG() {return ['ng', 'dr', 'buy', 'mov', 'games', 'zz', 'soc', 'major', 'interview', 'quit', 'qbb', 'buh', 'acid', 'crush', 'meet', 'breakup', 'ill', 'sex', 'love', 'exam', 'gig', 'bad', 'death', 'sea', 'abroad']; }
 
-    constructor(startMoment, weekNum, info, spans) {
-        const NOWTIME   = (new Date()).getTime();
-        this.startTime  = startMoment._d.getTime();
-        const endMoment = startMoment.clone().add(1, 'week').subtract(1, 'second');
-        this.endTime    = endMoment._d.getTime();
-
+    constructor(startMoment, endMoment, weekNum, info, spans) {
+        const NOWTIME      = (new Date()).getTime();
+        this.startTime     = startMoment._d.getTime();
+        this.endTime       = endMoment._d.getTime();
         this.year          = endMoment.isoWeekYear();   //год
         this.yearNum       = endMoment.isoWeek();       //номер недели в году
         this.weekNum       = weekNum;                //номер недели в жизни
@@ -42,16 +40,6 @@ class WeekModel {
                     this.colored_flags.push(colored_flag);
                 }
             }
-            //конструируем цвет согласно спэнам - NEWSTYLE
-           /* if (this.span_ids.length === 0)
-                this.bgStyle = "nospan";
-            else if (this.span_ids.length === 1)
-                this.bgStyle = this.span_ids[0];
-            else {
-                this.span_ids.sort();
-                this.bgStyle = this.span_ids.join("_");
-            }*/
-
             if (this.colored_flags.length === 0) {
                 this.bgcolor = "#cccccc";
             } else if (this.colored_flags.length == 1) {

@@ -1,7 +1,59 @@
 new Vue({
     el: "#vwol",
 
-    template: "#t_WolApp",
+    template: `
+    <div class="app-layout">
+    <wol-navbar :current="'wol'"></wol-navbar>
+    <wol-spinner :store="store"></wol-spinner>
+    <transition name="fade">
+    <div v-show="!store.loading">
+        <div class="cntnr">
+            <header style="padding-top:58px">
+                <div>
+                    <div class="pl">
+                        <strong>Прожито {{store.lived.percentage}}</strong>, недель: <strong>{{store.lived.weeks}}</strong>, дней: <strong>{{store.lived.days}}</strong>, часов: <strong>{{store.lived.hours}}</strong>
+                    </div>
+                    <div class="pl weeks-infoed">
+                        Недель заполнено: <strong>{{c_infoed}} ({{((c_infoed / store.lived.weeks) * 100).toFixed(1) + '%'}})</strong>
+                    </div>
+                    <div class="pr" style="position:relative;left:-27px">
+                        <strong>Осталось {{store.remained.percentage}}</strong>, недель: <strong>{{store.remained.weeks}}</strong>, дней: <strong>{{store.remained.days}}</strong>, часов: <strong>{{store.remained.hours}}</strong>
+                    </div>
+                </div>
+            </header>
+            <div style="position:relative">
+                <table class="yeartable clearfix">
+                    <tr v-for="(year_weeks, year, index) in store.years">
+                        <td class="yeartd year-header" valign="middle">{{year}}<span class="uninfoed" v-if="countUninfoed(year_weeks)">({{countUninfoed(year_weeks)}})</span></td>
+                        <td class="yeartd year-weeks" valign="middle">
+                            <div class="week-placeholder" v-if="index === 0" :style="'width:' + store.firstYearPlaceHolderWidth + 'px'"></div>
+                            <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week" v-on:week-clicked="editWeek(week)" v-on:week-created="createWeek(week)"></week-item>
+                        </td>
+                    </tr>
+                </table>
+                <div class="tag-bar">
+                    <div class="tag-bar-item" v-for="ti in c_tags">
+                        <div :class="'wi-outer wi-inner ' + ti.tag.replace('#','')" v-if="getTagIcons().includes(ti.tag)"></div>
+                        <a href="" @click.prevent="setTagged(ti)" class="tag-link" :class="{'strong': ti.weekNums.length>20, 'tag-selected': ti.tag == store.curTag}">{{ti.tag}}<small>&nbsp;</small>({{ti.weekNums.length}})&nbsp;&nbsp;&nbsp; </a>
+                    </div>
+                    <md-field>
+                        <label>Поиск</label>
+                        <md-input type="text" v-model="store.searchedWord" style="width:300px" />
+                    </md-field>
+                    <div style="text-align:center">
+                        <md-button type="button" @click="searchWord()">Искать в описаниях</md-button>
+                    </div>
+                </div>                        
+            </div>
+        </div>
+        </div>
+    </transition>
+    <edit-dialog></edit-dialog>
+    <map-dialog></map-dialog>
+    <message-dialog></message-dialog>
+    <pills-dialog></pills-dialog>
+    </div>
+    `,
 
     data() {
         return {
@@ -11,7 +63,7 @@ new Vue({
 
     computed: {
         c_infoed() {
-            return _.reduce(this.store.weeks, (memo, w) => +(!!w.info & !w.future) + memo, 0);
+            return this.store.weeks.reduce((memo, w) => +(!!w.info & !w.future) + memo, 0);
         },
 
         c_tags() {
@@ -21,35 +73,53 @@ new Vue({
 
     created() {
         this.store.loading = true;
-        LOG('created()', 'checking the auth with firebase');
-        fb.bindAuth(() => {
-            LOG('created()', "REQUESTING THE DATA");
-            axios.get(`${$server.BASE_URL}/api/wol/weeks`)
-                .then(response => {
-                    if (response.data) {
-                        LOG('created()', "DATA RECEIVED");
-                        let raw_data = response.data;
-                        this.initHeader(raw_data);
-                        this.initWeeks(raw_data);
-                    } else {
-                        ERROR('created()', "loading /api/wol/weeks failed")
-                    }
-                });
+        LOG('created()', 'WolApp CREATED. Checking the auth with firebase');
+        fb.bindAuth(async () => {
+            LOG('created()', "DATA REQUESTED");
+            try {
+                const response = await axios.get(`${$server.BASE_URL}/api/wol/weeks`);
+                if (response.data) {
+                    LOG('created()', "DATA RECEIVED");
+                    this.initData(response.data);
+                    LOG('created()', "DATA_INITIALIZED, START RENDERING");
+                } else {
+                    ERROR('created()', "loading /api/wol/weeks failed")
+                }
+            } catch (err) {
+                ERROR('created()', "loading /api/wol/weeks failed");
+            }
         });
     },
 
     mounted() {
-        LOG('mounted()', 'WolApp MOUNTED');
+        LOG("mounted()", 'WolApp MOUNTED');
+        $bus.$on("wit", this.checkWiTime);
+        $bus.$on("show-map-dialog", this.showMapDialog);
+        $bus.$on("show-pills-dialog", this.showPillsDialog);
+        $bus.$on("show-messages", this.showMessages);
+        $bus.$on("week-saved", this.saveWeek);
+        $bus.$on("prev-week", this.prevWeek);
+        $bus.$on("next-week", this.nextWeek);
+        $bus.$on("logout", this.logout);
     },
 
     updated() {
         if (this.store.loading) {
             this.store.loading = false;
-            LOG('updated()', "WolApp RENDERED");
+            const avg = this.store.test.wiTimes.reduce((memo, num) => memo + num, 0) / this.store.test.wiTimes.length;
+            LOG('updated()', `WolApp RENDERED. Avg week-item render time: ${avg/1000} ms`);
         }
     },
 
     methods: {
+        getTagIcons() {
+            return ['#ng', '#dr', '#buy', '#mov', '#games', '#major', '#interview', '#buh', '#acid', '#meet', '#crush', '#love', '#breakup', '#ill', '#exam', '#death', '#bad', '#sea', '#abroad'];
+        },
+
+        checkWiTime(time) {
+            this.store.test.wiTimes.push(time);
+        },
+
         error(msg, response, fname) {
             if (fname)
                 ERROR(fname, `[ERROR]: ${msg} ${response && response.status ? " status =  " + response.status : ''}`);
@@ -76,7 +146,8 @@ new Vue({
             window.location.replace('/login');
         },
 
-        initHeader(data) {
+        initData(data) {
+            // --- initHeader() ----
             //подготавливаем спаны для ускорения
             data.spans.forEach(span => {
                 span.startTime = (new Date(span.start)).getTime();
@@ -84,11 +155,9 @@ new Vue({
             });
 
             const NOWTIME = (new Date()).getTime();
-
             const birthTime = (new Date(data.birthdate)).getTime(); //время, когда родился (принимается за 00:00) <int>
-            //текущая дата <int>
             const deathTime = (new Date(data.deathdate)).getTime(); //смерть <int>
-            const whereIsNow = Math.min(deathTime, NOWTIME);        //"текущая дата жизни" = смерть или текущая дата <int>
+            const whereIsNow = Math.min(deathTime, NOWTIME); //"текущая дата жизни" = смерть или текущая дата <int>
 
             //Заполняем списки отжитого/оставшегося
             const daysLived = Math.round((whereIsNow - birthTime) / (1000 * 60 * 60 * 24));
@@ -107,40 +176,35 @@ new Vue({
                 weeks: Math.floor(daysRemained / 7),
                 hours: daysRemained * 24
             };
-        },
 
-        initWeeks(data) {
-            let weekNum = 0;    //текущий номер недели в жизни
+            //---- initWeeks() ----
+            let weekNum = 0; //текущий номер недели в жизни
             // начало недели, когда родился <int>
-            let weekStartMoment = moment(data.birthdate).startOf("week");     //текущая дата
-            const deathTime = (new Date(data.deathdate)).getTime();					 //смерть <int>
-
-            let weeks = [];
-            while (weekStartMoment._d.getTime() < deathTime) {
-                weekNum++;
-
-                const dbWeek = data.weekInfo[weekNum];
-                const week = dbWeek ?
-                    new WeekModel(weekStartMoment, weekNum, dbWeek.info, data.spans) :
-                    new WeekModel(weekStartMoment, weekNum, '', data.spans);
-
+            let startMoment = moment(data.birthdate).startOf("week"); //начало недели
+            const weeks = [];
+            while (startMoment._d.getTime() < deathTime) {
+                weekNum++; //номер недели
+                let endMoment = startMoment.clone().add(1, 'week').subtract(1, 'second'); //конец недели
+                let dbWeek = data.weekInfo[weekNum];
+                let week = new WeekModel(startMoment, endMoment, weekNum, (dbWeek ? dbWeek.info : ""), data.spans);
                 //инициализация первого холдера
                 if (weekNum === 1 && week.yearNum > 1) {
                     this.store.firstYearPlaceHolderWidth = (week.yearNum - 1) * 20 - 3;
                 }
-
                 weeks.push(week);
-                weekStartMoment.add(1, 'week');	//fixed
+                endMoment.add(1, 'second');
+                startMoment = endMoment;
             }
 
-            LOG('initWeeks', "DATA_INITIALIZED, START RENDERING");
+            this.tagsUpdateAll(weeks);
             this.store.years = _.groupBy(weeks, 'year');
             this.store.weeks = weeks;
 
+            //текущая неделя
             this.store.curWeek = {
                 info: "",
                 weekNum: -1
-            };  //текущая неделя
+            };
         },
 
         //------------------------------Показ диалогов-----------------------------------------------------------
@@ -160,24 +224,29 @@ new Vue({
         showMapDialog() {
             if (!this.store.shownMapDialog) {
                 this.store.shownMapDialog = true;
-                Vue.nextTick(() => {
+                this.$nextTick(() => {
                     this.initTravels();
                 });
             }
         },
 
+        showPillsDialog() {
+            if (!this.store.shownPillsDialog) {
+                this.store.shownPillsDialog = true;
+            }
+        },
+
         //---------------------------- Расчеты в режиме недельки -----------------------------------------------------
         //посчитать сколько не заполнено в году
-        countUninfoed: year_weeks => _.reduce(year_weeks, (memo, week) => memo + +(!week.info & !week.future), 0),
+        countUninfoed: year_weeks => year_weeks.reduce((memo, week) => memo + +(!week.info & !week.future), 0),
 
         //----------------------------Загрузка и сохранение в режиме неделек -----------------------------------------
         /**
          * Добавляем недельку забинженную в компонент
          * @param week
          */
-        mountWeek(week) {
+        createWeek(week) {
             this.store.weeks[week.weekNum] = week;
-            this.tagsUpdate(week);
         },
 
         /**
@@ -202,65 +271,58 @@ new Vue({
          * @param week
          * @param forced
          */
-        loadMessages(week, forced) {
+        async loadMessages(week, forced) {
             if (week.messages.length && !forced)
                 return;
             week.msgLoading = true;
-            axios.get(`${$server.BASE_URL}/api/msg/${week.weekNum}`)
-                .then(
-                    response => {
-                        if (response.data) {
-                            week.messages = response.data;
-                            week.msgLoading = false;
-                            week.msgCount = _.reduce(week.messages, (memo, chat) => chat.messages.length + memo, 0);
-                            LOG('loadMessages', `Messages loaded for week ${week.weekNum}, count ${week.msgCount}`);
-                        }
-                    }
-                )
-                .catch(error => {
-                    this.error(`cannot load messages for week ${week.weekNum}`, error, 'loadMessages');
-                });
+            try {
+                const response = await axios.get(`${$server.BASE_URL}/api/msg/${week.weekNum}`);
+                if (response.data) {
+                    week.messages = response.data;
+                    week.msgLoading = false;
+                    week.msgCount = week.messages.reduce((memo, chat) => chat.messages.length + memo, 0);
+                    LOG('loadMessages', `Messages loaded for week ${week.weekNum}, count ${week.msgCount}`);
+                }
+            } catch (err) {
+                this.error(`cannot load messages for week ${week.weekNum}`, err, 'loadMessages');
+            };
         },
 
         /**
          * сохранение инфо недели
          */
-        saveWeek() {
-            const _week = this.store.curWeek;
-            this.store.weeks[_week.weekNum].info = _week.editInfo;
-
-            axios.post(`${$server.BASE_URL}/api/wol/weeks`,
-                {
+        async saveWeek() {
+            const week = this.store.curWeek;
+            this.store.weeks[week.weekNum].info = week.editInfo;
+            try {
+                const response = await axios.post(`${$server.BASE_URL}/api/wol/weeks`, {
                     name: this.store.name,
-                    weekNum: _week.weekNum,
-                    info: _week.info,
-                    msgCount: _week.msgCount
-                })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.success(`Week ${_week.weekNum} saved to DB.`, 'saveWeek');
-                        this.tagsUpdate(_week);
-                    } else {
-                        this.error('error saving week', response, 'saveWeek');
-                    }
-                }
-                ).catch(error => {
-                    this.error(`Error saving week:`, error, 'saveWeek');
+                    weekNum: week.weekNum,
+                    info: week.info,
+                    msgCount: week.msgCount
                 });
+                if (response.status === 200) {
+                    this.success(`Week ${week.weekNum} saved to DB.`, 'saveWeek');
+                    this.tagsUpdate(week);
+                } else {
+                    this.error('Error saving week:', response, 'saveWeek');
+                }
+            } catch (err) {
+                this.error(`Error saving week:`, err, 'saveWeek');
+            };
         },
 
         //-------------------------- Навигация в режиме неделек ------------------------------------------------------
         /**
          * предыдущая неделя
          */
-
-
         prevWeek() {
             if (!this.store.curWeek && this.store.curWeek.weekNum === 1) {
                 return;
             }
-            const week = _.findWhere(this.store.weeks, { weekNum: this.store.curWeek.weekNum - 1 });
-            this.editWeek(week);
+            const week = this.store.weeks.find(week => week.weekNum == this.store.curWeek.weekNum - 1);
+            if (week)
+                this.editWeek(week);
         },
 
 
@@ -271,7 +333,7 @@ new Vue({
             if (!this.store.curWeek) {
                 return;
             }
-            const week = _.findWhere(this.store.weeks, { weekNum: this.store.curWeek.weekNum + 1 });
+            const week = this.store.weeks.find(week => week.weekNum == this.store.curWeek.weekNum + 1);
             if (week && !week.future) {
                 this.editWeek(week);
             }
@@ -285,7 +347,7 @@ new Vue({
             if (!this.store.curWeek) {
                 return;
             }
-            const week = _.findWhere(this.store.weeks, { yearNum: this.store.curWeek.yearNum, year: this.store.curWeek.year + 1 });
+            const week = this.store.weeks.find(week => week.yearNum == this.store.curWeek.yearNum && week.year == this.store.curWeek.year + 1);
             if (week && !week.future) {
                 this.editWeek(week);
             }
@@ -299,40 +361,66 @@ new Vue({
             if (!this.store.curWeek) {
                 return;
             }
-            const week = _.findWhere(this.store.weeks, { yearNum: this.store.curWeek.yearNum, year: this.store.curWeek.year - 1 });
+            const week = this.store.weeks.find(week => week.yearNum == this.store.curWeek.yearNum && week.year == this.store.curWeek.year - 1);
             if (week) {
                 this.editWeek(week);
             }
         },
 
-
         //--------------------- Тэги ---------------------------------------------------------------------------------
+        tagsUpdateAll(weeks) {
+            const stats = [];
+            weeks.forEach(week => {
+                week.getTags().forEach(tag => {
+                    const ti = stats.find(ti => ti.tag == tag);
+                    if (!ti) {
+                        stats.push({
+                            tag: tag,
+                            weekNums: [week.weekNum]
+                        });
+                    } else {
+                        ti.weekNums.push(week.weekNum);
+                    }
+                })
+            });
+            //добавляем картинкотаги (0)
+            this.getTagIcons().forEach(tag => {
+                if (!stats.find(ti => ti.tag == tag)) {
+                    stats.push({
+                        tag: tag,
+                        weekNums: []
+                    });
+                }
+            })
+            this.store.tags.stats = stats;
+        },
+
         /**
          * Обновление тэгов, по текущей неделе
          * @param week
          */
         tagsUpdate(week) {
-            let _stats = this.store.tags.stats;
+            const stats = this.store.tags.stats;
             //добавляем только что добавленный тег
             week.getTags().forEach(tag => {
-                let ti = _.findWhere(_stats, { tag });
-                if (!ti) {
-                    _stats.push({
+                const tagInfo = stats.find(ti => ti.tag == tag);
+                if (!tagInfo) {
+                    stats.push({
                         tag,
                         weekNums: [week.weekNum]
                     });
                     this.store.tags.updateCache = true;
                 }
-                if (this.isCurrentTag(ti)) {
+                if (this.isCurrentTag(tagInfo)) {
                     week.tagged = true;
                 }
             });
             //проверяем не нужно ли убрать
-            _stats.forEach(ti => {
-                const weekInTag = ti.weekNums.indexOf(week.weekNum);
-                if (weekInTag >= 0) {
+            stats.forEach(ti => {
+                const indexOfWeekNumInTag = ti.weekNums.indexOf(week.weekNum);
+                if (indexOfWeekNumInTag >= 0) {
                     if (!week.hasTag(ti.tag)) {
-                        ti.weekNums.splice(weekInTag);
+                        ti.weekNums.splice(indexOfWeekNumInTag);
                         if (week.tagged && this.isCurrentTag(ti))
                             week.tagged = false;
                     }
@@ -348,7 +436,7 @@ new Vue({
 
 
         /**
-        * поиск слова в инфо
+         * поиск слова в инфо
          */
         searchWord() {
             this.clearTagged();
@@ -376,7 +464,7 @@ new Vue({
          * @param ti - tagInfo
          */
         setTagged(ti) {
-            let turnoff = this.isCurrentTag(ti);
+            const turnoff = this.isCurrentTag(ti);
             this.clearTagged();
             if (turnoff)
                 return;
@@ -402,71 +490,72 @@ new Vue({
         },
 
         //-------------- КАРТЫ -------------------------
-        saveTravel(pos) {
-            axios.post(`${$server.BASE_URL}/api/travels`, pos).then(
-                response => {
-                    if (response.status === 200) {
-                        LOG('saveTravel', "coords lat=" + pos.lat + "; lng=" + pos.lng + " successfully saved");
-                    } else {
-                        console.log(response.status);
-                    }
-                }).catch(
-                    (err) => {
-                        this.error("Error saving coords", err, "saveTravel")
-                    }
-                );
+        async saveTravel(pos, cb) {
+            try {
+                const response = await axios.post(`${$server.BASE_URL}/api/travels`, pos);
+                if (response.status === 200) {
+                    LOG('saveTravel', "coords lat=" + pos.lat + "; lng=" + pos.lng + " successfully saved");
+                    pos._id = response.data._id;
+                    cb(pos);
+                } else {
+                    console.log(response.status);
+                }
+            } catch (err) {
+                this.error("Error saving coords", err, "saveTravel")
+            }
         },
 
-        removeTravel(_id) {
-            axios.delete(`${$server.BASE_URL}/api/travels/${_id}`).then(
-                response => {
-                    if (response.status === 200) {
-                        LOG("removeTravel", `travel _id = ${_id} successfully removed`);
-                    } else {
-                        console.log(response.status);
-                    }
-                }).catch(
-                    (err) => {
-                        this.error("Error saving coords: ", err, 'removeTravel');
-                    }
-                );
+        async removeTravel(_id) {
+            try {
+                const response = await axios.delete(`${$server.BASE_URL}/api/travels/${_id}`);
+                if (response.status === 200) {
+                    LOG("removeTravel", `travel _id = ${_id} successfully removed`);
+                } else {
+                    console.log(response.status);
+                }
+            } catch (err) {
+                this.error("Error deleting travel: ", err, 'removeTravel');
+            }
         },
 
-        initTravels() {
+        async initTravels() {
             LOG("initMap", "start");
-            let self = this;
-            axios.get(`${$server.BASE_URL}/api/travels`).then(
-                response => {
-                    let travels = response.data;
+            const self = this;
+            try {
+                const response = await axios.get(`${$server.BASE_URL}/api/travels`);
 
-                    let map = new google.maps.Map(document.getElementById('map'), {
-                        zoom: 4,
-                        center: travels[travels.length - 1]
+                const travels = response.data.filter(t => t._id);
+                const map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 4,
+                    center: travels[travels.length - 1]
+                });
+
+                function _createMarker(travel) {
+                    const marker = new google.maps.Marker({
+                        position: travel,
+                        map
                     });
+                    marker._id = travel._id;
+                    google.maps.event.addListener(marker, "dblclick", function () {
+                        self.removeTravel(marker._id);
+                        marker.setMap(null);
+                    })
+                }
 
-                    function _createMarker(travel) {
-                        let marker = new google.maps.Marker({ position: travel, map });
-                        marker._id = travel._id;
-                        google.maps.event.addListener(marker, "dblclick", function () {
-                            self.removeTravel(marker._id);
-                            marker.setMap(null);
-                        })
-                    }
-                    
-                    travels.forEach(_createMarker);
-
-                    google.maps.event.addListener(map, 'click', function (event) {
-                        _createMarker(event.latLng);
-                        self.saveTravel({
-                            lat: event.latLng.lat(),
-                            lng: event.latLng.lng()
-                        });
+                travels.forEach(_createMarker);
+                google.maps.event.addListener(map, 'click', function (event) {
+                    self.saveTravel({
+                        lat: event.latLng.lat(),
+                        lng: event.latLng.lng()
+                    }, function (newTravel) {
+                        _createMarker(newTravel);
                     });
+                });
+                LOG("initMap", "map loaded");
 
-                    LOG("initMap", "map loaded");
-                })
-                .catch(err => LOG('initMap', 'initMap failed:'));
+            } catch (err) {
+                LOG('initMap', 'initMap failed:');
+            }
         }
     }
 });
-
