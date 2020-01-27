@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import $bus from '../bus.js'
+
 export default {
     props: ['week'],
 
@@ -28,12 +30,12 @@ export default {
 
     methods: {
         onClick () {
-            this.$emit("week-clicked", this.week);
+            $bus.$emit("week-clicked", this.week);
         }
     },
 
     created() {
-        this.$emit("week-created", this.week);
+        $bus.$emit("week-created", this.week);
         this.created = (new Date()).getTime();
     },
 

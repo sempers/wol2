@@ -2,7 +2,8 @@ var path = require('path')
 var webpack = require('webpack')
 
 module.exports = {
-    entry: './client/src/main.js',
+    entry: ['babel-polyfill', './client/src/main.js'],
+    
     externals: {
         jQuery: 'jQuery',
         underscore: '_',
@@ -14,8 +15,8 @@ module.exports = {
     },
 
     output: {
-        path: path.resolve(__dirname, './client/app'),
-        publicPath: '/app/',
+        path: path.resolve(__dirname, './client/dist'),
+        publicPath: '/dist/',
         filename: 'build.js'
     },
 
@@ -27,13 +28,12 @@ module.exports = {
                     'vue-style-loader',
                     'css-loader'
                 ],
-            }, {
+            }, 
+            {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
-                    loaders: {
-                    }
-                    // other vue-loader options go here
+                    loaders: { }
                 }
             },
             {

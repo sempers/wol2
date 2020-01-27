@@ -17,7 +17,7 @@ const app = express();
 
 app.engine("html", cons.ejs);
 app.set('view engine', 'html');
-app.set("views", path.resolve(__dirname, '../client/app'));
+app.set("views", path.resolve(__dirname, '../client'));
 app.set('trust proxy', 1);
 
 app.use(express.static(path.resolve(__dirname, '../client'), {
@@ -34,6 +34,8 @@ app.use(cookieSession({
 }));
 
 //html
+app.get("/lib/server.js", api_wol.renderServerParams);
+
 app.get("/wol", api_wol.renderWol);
 app.get("/login", api_wol.renderLogin);
 app.get("/test/wol", api_wol.renderTestWol);

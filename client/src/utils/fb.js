@@ -11,11 +11,11 @@ const fbConfig = {
 
 const fbApp = firebase.initializeApp(fbConfig);
 
-export function TRY_AUTH(continueLoading, noGoToLogin) {
+export function TRY_AUTH(toContinue, noGoToLogin) {
 	fbApp.auth().onAuthStateChanged(user => {
 		if (user) {
 			LOG("TRY_AUTH()", `User ${user.email} is already authenticated, last logged in at ${new Date(+user.toJSON().lastLoginAt).toString()}`);
-			continueLoading();
+			toContinue();
 		} else {
 			LOG("TRY_AUTH()", "User was not authenticated");
 			if (!noGoToLogin) window.location.replace("/login");

@@ -1,35 +1,36 @@
 <template>
     <md-dialog id="pillsDialog" :md-active.sync="store.shownPillsDialog">
-            <md-dialog-content>
-                <div class="ib">Последний пересчет: {{obj.lastSave | fmtDate}}</div>
-                <md-button class="md-icon-button md-dense action-btn" @click="close()">
-                    <md-icon>clear</md-icon>
-                </md-button>
-                <md-button class="md-icon-button md-dense action-btn" @click="save()">
-                    <md-icon>done</md-icon>
-                </md-button>
-                <md-table class="pills-table">
-                    <md-table-row>
-                        <md-table-head>Препарат</md-table-head>
-                        <md-table-head>1 таб (мг)</md-table-head>
-                        <md-table-head>Доза (мг)</md-table-head>
-                        <md-table-head>Количество</md-table-head>
-                        <md-table-head>Закончится</md-table-head>
-                    </md-table-row>
-                    <md-table-row v-for="pill in obj.pills" :key="pill.name">
-                        <md-table-cell >{{pill.name}}</md-table-cell>
-                        <md-table-cell >{{pill.unit}}</md-table-cell>
-                        <md-table-cell >{{pill.dose}}</md-table-cell>
-                        <md-table-cell ><input type="text" v-model="pill.available" /></md-table-cell>
-                        <md-table-cell >{{pill.finish}}</md-table-cell>
-                    </md-table-row>
-                </md-table>
-            </md-dialog-content>
-        </md-dialog>
+        <md-dialog-content>
+            <div class="ib">Последний пересчет: {{obj.lastSave | fmtDate}}</div>
+            <md-button class="md-icon-button md-dense action-btn" @click="close()">
+                <md-icon>clear</md-icon>
+            </md-button>
+            <md-button class="md-icon-button md-dense action-btn" @click="save()">
+                <md-icon>done</md-icon>
+            </md-button>
+            <md-table class="pills-table">
+                <md-table-row>
+                    <md-table-head>Препарат</md-table-head>
+                    <md-table-head>1 таб (мг)</md-table-head>
+                    <md-table-head>Доза (мг)</md-table-head>
+                    <md-table-head>Количество</md-table-head>
+                    <md-table-head>Закончится</md-table-head>
+                </md-table-row>
+                <md-table-row v-for="pill in obj.pills" :key="pill.name">
+                    <md-table-cell >{{pill.name}}</md-table-cell>
+                    <md-table-cell >{{pill.unit}}</md-table-cell>
+                    <md-table-cell >{{pill.dose}}</md-table-cell>
+                    <md-table-cell ><input type="text" v-model="pill.available" /></md-table-cell>
+                    <md-table-cell >{{pill.finish}}</md-table-cell>
+                </md-table-row>
+            </md-table>
+        </md-dialog-content>
+    </md-dialog>
 </template>
 
 <script>
 import $store from './store.js'
+import { LOG } from '../utils/logging.js'
 
 export default {
     data() {

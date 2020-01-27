@@ -118,15 +118,15 @@ export default {
         },
 
         goPrevious() {
-            if (this.store.curWeek.weekNum > 1) this.$emit("prev-week");
+            if (this.store.curWeek.weekNum > 1) $bus.$emit("prev-week");
         },
 
         goNext() {
-            this.$emit("next-week");
+            $bus.$emit("next-week");
         },
 
         onSave(exit) {
-            this.$emit("week-saved");
+            $bus.$emit("week-saved");
             if (exit) {
                 this.store.shownEditDialog = false;
             }
@@ -134,7 +134,7 @@ export default {
 
         onShowMessages() {
             if (this.store.curWeek.messages.length)
-                this.$emit("show-messages", this.store.curWeek.messages);
+                $bus.$emit("show-messages", this.store.curWeek.messages);
         }
     }
 };

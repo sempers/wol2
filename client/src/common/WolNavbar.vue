@@ -11,7 +11,7 @@
 
 <script>
 	import WolNavBtn from "./WolNavBtn";
-	import $bus from "./bus.js"
+	import $bus from "../bus.js"
 
 	export default {
 		props: ["current"],
@@ -20,7 +20,7 @@
 
 		data() {
 			return {
-				MODULES: window.$server.MODULES
+				modules: window.$server.MODULES
 			};
 		},
 
@@ -29,5 +29,5 @@
             	$bus.$emit(key);
         	}
 		}
-	};
+	}
 </script>

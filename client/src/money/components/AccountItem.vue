@@ -1,9 +1,9 @@
 <template>
-    <div class="account-item" @click.ctrl.prevent="toggle()" @click.right.prevent="edit()" @click="select()" :class="{'active': store.cur.account && store.cur.account.name == account.name, 'hidden':account.hidden}" >
+     <div class="acc-item" @click.ctrl.prevent="toggle()" @click.right.prevent="edit()" @click="select()" :class="{'active': store.cur.account && store.cur.account.name == account.name, 'hidden':account.hidden}" >
         <cat-icon :category="account.category" :currency="account.currency"></cat-icon>
         <div class="account-name" v-show="!edited">{{account.name}}</div>
         <md-field style="width:70px;" v-show="edited">
-            <md-input v-model="account.name" @keydown="onKeyDown($event)" ></md-input>
+            <md-input v-model.lazy="account.name" @keydown="onKeyDown($event)" ></md-input>
         </md-field>
         <md-field style="width:25px;" v-show="edited">
             <md-input v-model.number.lazy="account.sort" @keydown="onKeyDown($event)"></md-input>
@@ -16,16 +16,18 @@
 
 <script>
 import $store from '../store.js'
+import $bus from '../../bus.js'
 
 export default {
     props: ["account"],
 
     data() {
-        return {
+         return {
             store: $store,
             edited: false,
-            oldName: ""
-        };
+            oldName: "",
+            oldHidden: false
+        }
     },
 
     methods: {

@@ -1,5 +1,5 @@
 <template>
-<div class="balance-item">
+<div class="balance-container">
         <div class="currency-code" v-if="currency">{{currency}}</div>
         <div class="account-balance">
             <div class="amount" :class='{"income": amount >= 0 && (currency != "%"), "expense": amount < 0 && (currency !="%")}'>
@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="secondary-amount" v-if="secondary  && amount !== 0">{{secondary_amount | fmtAmount({places: 0})}}&nbsp;&nbsp;{{secondary}}</div>
-</div>
+    </div>
 </template>
 
 <script>
@@ -58,10 +58,6 @@ export default {
 
         btc_amount() {
             return this.store.convert(this.amount, this.currency, "BTC");
-        },
-
-        eth_amount() {
-            return this.store.convert(this.amount, this.currency, "ETH");
         }
     },
 

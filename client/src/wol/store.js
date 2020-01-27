@@ -58,5 +58,8 @@ export default {
 	map: [],
 
 	googleMapsLoaded: false,
-};
 
+	test: {
+		wiTimes: []
+	}
+}

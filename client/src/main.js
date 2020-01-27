@@ -21,7 +21,7 @@ window.vm = new Vue({
 
 	template: `
 	<div>
-		<wol-navbar :current="current" v-on:show-map-dialog="showMapDialog()" v-on:logout="logout()"></wol-navbar>
+		<wol-navbar :current="current"></wol-navbar>
 		<wol-app></wol-app>
 	</div>
 	`

@@ -289,10 +289,10 @@ export default {
             g: parseInt(result[2], 16),
             b: parseInt(result[3], 16)
         } : {
-                r: 255,
-                g: 255,
-                b: 255
-            };
+            r: 255,
+            g: 255,
+            b: 255
+        };
     },
 
     hexToRgba(hex, alpha) {

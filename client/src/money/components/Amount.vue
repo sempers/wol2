@@ -1,11 +1,15 @@
 <template>
-    <div class="amount" :class='{"income": amount > 0 && (!type || type=="income"), "expense": amount < 0 && (!type || type=="expense"), "transfer": (type=="transfer" || type=="transfer-fix"), "balance_reset": type == "balance_reset"}'>{{amount | fmtAmount(c_options)}}</div>
+<div class="amount" :class='{"income": amount > 0 && (!type || type=="income"), "expense": amount < 0 && (!type || type=="expense"), "transfer": (type=="transfer" || type=="transfer-fix"), "balance_reset": type == "balance_reset"}'>{{amount | fmtAmount(c_options)}}</div>
 </template>
 
 <script>
+import $filters from '../filters.js'
+
 export default {
     props: ["amount", "type", "category", "options"],
     
+    filters: $filters,
+
     computed: {
         c_options() {
             let options = this.options || {};
@@ -66,6 +70,4 @@ export default {
         color: #222;
     }
 }
-
-
 </style>

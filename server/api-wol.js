@@ -12,6 +12,10 @@ function renderTestWol(req, res) {
     res.render("wol/wol-vue.html", require("./test_data/wol_data"));
 }
 
+function renderServerParams(req, res) {
+    res.render("server.html", config.serverParams());
+}
+
 //GET /api/wol/weeks
 function getWeeks(req, res) {
     let data = {};
@@ -65,7 +69,8 @@ module.exports = {
     getWeeks,
     saveWeek,
     test,
-    renderLogin
+    renderLogin,
+    renderServerParams
 };
 
 //create    add

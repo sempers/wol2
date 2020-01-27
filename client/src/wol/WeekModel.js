@@ -1,13 +1,11 @@
 //-------------- WEEK MODEL ----------------//
 export default class WeekModel {
-    allowedPNG() {return ['ng', 'dr', 'buy', 'mov', 'games', 'zz', 'soc', 'major', 'interview', 'quit', 'qbb', 'buh', 'acid', 'crush', 'meet', 'breakup', 'ill', 'sex', 'love', 'exam', 'gig', 'bad', 'death', 'sea', 'abroad']}
+    allowedPNG() {return ['ng', 'dr', 'buy', 'mov', 'games', 'zz', 'soc', 'major', 'interview', 'quit', 'qbb', 'buh', 'acid', 'crush', 'meet', 'breakup', 'ill', 'sex', 'love', 'exam', 'gig', 'bad', 'death', 'sea', 'abroad']; }
 
-    constructor(startMoment, weekNum, info, spans) {
-        const NOWTIME   = (new Date()).getTime();
-        this.startTime  = startMoment._d.getTime();
-        const endMoment = startMoment.clone().add(1, 'week').subtract(1, 'second');
-        this.endTime    = endMoment._d.getTime();
-
+    constructor(startMoment, endMoment, weekNum, info, spans) {
+        const NOWTIME      = (new Date()).getTime();
+        this.startTime     = startMoment._d.getTime();
+        this.endTime       = endMoment._d.getTime();
         this.year          = endMoment.isoWeekYear();   //год
         this.yearNum       = endMoment.isoWeek();       //номер недели в году
         this.weekNum       = weekNum;                //номер недели в жизни
@@ -42,7 +40,6 @@ export default class WeekModel {
                     this.colored_flags.push(colored_flag);
                 }
             }
-
             if (this.colored_flags.length === 0) {
                 this.bgcolor = "#cccccc";
             } else if (this.colored_flags.length == 1) {

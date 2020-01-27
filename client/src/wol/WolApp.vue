@@ -24,7 +24,7 @@
                         <td class="yeartd year-header" valign="middle">{{year}}<span class="uninfoed" v-if="countUninfoed(year_weeks)">({{countUninfoed(year_weeks)}})</span></td>
                         <td class="yeartd year-weeks" valign="middle">
                             <div class="week-placeholder" v-if="index === 0" :style="'width:' + store.firstYearPlaceHolderWidth + 'px'"></div>
-                            <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week" v-on:week-clicked="editWeek(week)" v-on:week-created="createWeek(week)"></week-item>
+                            <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week"></week-item>
                         </td>
                     </tr>
                 </table>
@@ -54,6 +54,7 @@
 
 <script>
 import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'
+import { TRY_AUTH, LOGOUT } from '../utils/fb.js'
 import WeekModel from './WeekModel.js'
 import _ from 'underscore'
 import axios from 'axios'
@@ -88,25 +89,14 @@ export default {
     created() {
         this.store.loading = true;
         LOG('created()', 'checking the auth with firebase');
-        //fb.bindAuth(() => {
-            LOG('created()', "DATA REQUESTED");
-            try {
-                const response = await axios.get(`${$server.BASE_URL}/api/wol/weeks`);
-                if (response.data) {
-                    LOG('created()', "DATA RECEIVED");
-                    this.initData(response.data);
-                    LOG('created()', "DATA_INITIALIZED, START RENDERING");
-                } else {
-                    ERROR('created()', "loading /api/wol/weeks failed")
-                }
-            } catch (err) {
-                ERROR('created()', "loading /api/wol/weeks failed");
-            }
-        //});
+        //TRY_AUTH(this.init);
+        this.init();
     },
 
     mounted() {
         LOG("mounted()", 'WolApp MOUNTED');
+        $bus.$on("week-created", this.createWeek);
+        $bus.$on("week-clicked", this.editWeek);
         $bus.$on("wit", this.checkWiTime);
         $bus.$on("show-map-dialog", this.showMapDialog);
         $bus.$on("show-pills-dialog", this.showPillsDialog);
@@ -126,6 +116,22 @@ export default {
     },
 
     methods: {
+        async init() {
+            LOG('created()', "DATA REQUESTED");
+            try {
+                const response = await axios.get(`${$server.BASE_URL}/api/wol/weeks`);
+                if (response.data) {
+                    LOG('created()', "DATA RECEIVED");
+                    this.initData(response.data);
+                    LOG('created()', "DATA_INITIALIZED, START RENDERING");
+                } else {
+                    ERROR('created()', "loading /api/wol/weeks failed")
+                }
+            } catch (err) {
+                ERROR('created()', "loading /api/wol/weeks failed");
+            }
+        },
+
         getTagIcons() {
             return ['#ng', '#dr', '#buy', '#mov', '#games', '#major', '#interview', '#buh', '#acid', '#meet', '#crush', '#love', '#breakup', '#ill', '#exam', '#death', '#bad', '#sea', '#abroad'];
         },
@@ -143,10 +149,7 @@ export default {
         },
 
         success(msg, fname) {
-            if (fname)
-                LOG(fname, `[SUCCESS]: ${msg}`);
-            else
-                FIX_TIME(`[SUCCESS]: ${msg}`);
+            fname ? LOG(fname, `[SUCCESS]: ${msg}`) : FIX_TIME(`[SUCCESS]: ${msg}`);
             toastr.success(msg);
         },
 
@@ -156,7 +159,7 @@ export default {
 
         logout() {
             this.store.loading = true;
-            //fb.logout();
+            LOGOUT();
             window.location.replace('/login');
         },
 
@@ -339,7 +342,6 @@ export default {
                 this.editWeek(week);
         },
 
-
         /**
          * следующая неделя
          */
@@ -353,7 +355,6 @@ export default {
             }
         },
 
-
         /**
          * вперед один год
          */
@@ -366,7 +367,6 @@ export default {
                 this.editWeek(week);
             }
         },
-
 
         /**
          * назад один год
