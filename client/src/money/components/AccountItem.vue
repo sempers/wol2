@@ -17,8 +17,12 @@
 <script>
 import $store from '../store.js'
 import $bus from '../../bus.js'
+import Balance from './Balance.vue'
+import CatIcon from './CatIcon.vue'
 
 export default {
+    components: {Balance, CatIcon},
+
     props: ["account"],
 
     data() {

@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'
+import { LOG, ERROR, FIX_TIME } from '../../utils/logging.js'
 import $store from '../store.js'
 import $bus from '../../bus.js'
 import moment from 'moment'

@@ -2,31 +2,48 @@
     <div id="stats-col">
         <div class="item stats-net-worth">
             <div class="account-name">NET WORTH</div>
-            <balance :amount="store.stats.net_worth" :currency="'RUB'" :secondary="'USD'" :category="'rouble'"></balance>
+            <balance
+                :amount="store.stats.net_worth"
+                :currency="'RUB'"
+                :secondary="'USD'"
+                :category="'rouble'"
+            ></balance>
         </div>
         <md-divider></md-divider>
-        <div class="item stats-items" :class="{'active': store.cur.account && store.cur.account.name == 'ITEMS'}" @click="selectSpecialAccount('ITEMS')">
+        <div
+            class="item stats-items"
+            :class="{'active': store.cur.account && store.cur.account.name == 'ITEMS'}"
+            @click="selectSpecialAccount('ITEMS')"
+        >
             <cat-icon :category="'items'"></cat-icon>
             <div class="account-name">Имущество</div>
             <balance :amount="store.stats.personal_things" :currency="'RUB'" :category="'rouble'"></balance>
         </div>
 
-        <div class="item stats-flat" :class="{'active': store.cur.account && store.cur.account.name == 'FLAT'}" @click="selectSpecialAccount('FLAT')">
+        <div
+            class="item stats-flat"
+            :class="{'active': store.cur.account && store.cur.account.name == 'FLAT'}"
+            @click="selectSpecialAccount('FLAT')"
+        >
             <cat-icon :category="'flat'"></cat-icon>
             <div class="account-name">Квартира</div>
             <balance :amount="store.stats.flat_value" :currency="'RUB'" :category="'rouble'"></balance>
         </div>
-        <div class="item stats-mortgage" :class="{'active': store.cur.account && store.cur.account.name == 'MORTGAGE'}" @click="selectSpecialAccount('MORTGAGE')">
+        <div
+            class="item stats-mortgage"
+            :class="{'active': store.cur.account && store.cur.account.name == 'MORTGAGE'}"
+            @click="selectSpecialAccount('MORTGAGE')"
+        >
             <cat-icon :category="'mortgage'"></cat-icon>
             <div class="account-name">Ипотека</div>
             <balance :amount="store.stats.mortgage" :currency="'RUB'" :category="'rouble'"></balance>
         </div>
         <md-divider></md-divider>
-        <div class="item " >
+        <div class="item">
             <div class="account-name">Инвестировано</div>
-            <balance :amount="store.stats.flat_invested" :currency="'RUB'" :category="'rouble'" ></balance>
+            <balance :amount="store.stats.flat_invested" :currency="'RUB'" :category="'rouble'"></balance>
         </div>
-        <div class="item ">
+        <div class="item">
             <div class="account-name">Эквити квартиры</div>
             <balance :amount="store.stats.flat_equity" :currency="'RUB'" :category="'rouble'"></balance>
         </div>
@@ -75,22 +92,27 @@
             <div class="ib pl">Обновлено:</div>
             <div class="ib pr">{{last_updated_time}}</div>
         </div>
-        <div class="item stats-rates" style="padding:0;display:flex;justify-content:center" v-show="isFirstDayOfMonth()" >
-            <md-button class="md-raised md-dense" @click="saveRates()">
-                Сохранить курсы
-            </md-button>
+        <div
+            class="item stats-rates"
+            style="padding:0;display:flex;justify-content:center"
+            v-show="isFirstDayOfMonth()"
+        >
+            <md-button class="md-raised md-dense" @click="saveRates()">Сохранить курсы</md-button>
         </div>
     </div>
 </template>
 
 <script>
-import $store from '../store.js'
-import _ from 'underscore'
-import moment from 'moment'
-import $bus from '../bus.js'
-
+import $store from "../store.js";
+import _ from "underscore";
+import moment from "moment";
+import $bus from "../../bus.js";
+import RateItem from "./RateItem.vue";
+import Amount from "./Amount.vue";
 
 export default {
+    components: { RateItem, Amount },
+
     data() {
         return {
             store: $store
@@ -100,8 +122,7 @@ export default {
     computed: {
         last_updated_time() {
             let d = this.store.lastUpdated;
-            if (!(d instanceof Date))
-                return "n/a";
+            if (!(d instanceof Date)) return "n/a";
             return moment(d).format("DD.MM.YYYY HH:mm:ss");
         }
     },
@@ -112,23 +133,25 @@ export default {
         },
 
         selectSpecialAccount(acc_name) {
-            var acc = _.find(this.store.accounts, acc => acc.special && acc.name == acc_name);
+            var acc = _.find(
+                this.store.accounts,
+                acc => acc.special && acc.name == acc_name
+            );
             if (acc) {
                 $bus.$emit("account-selected", acc);
             }
         },
 
         isFirstDayOfMonth() {
-            return (new Date()).getDate() == 1;
+            return new Date().getDate() == 1;
         },
 
         saveRates() {
             $bus.$emit("save-rates-clicked");
-        },
+        }
     }
-}
+};
 </script>
 
 <style lang="less">
-
 </style>

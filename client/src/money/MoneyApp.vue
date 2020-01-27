@@ -1,25 +1,25 @@
 <template>
-<div class="app-layout">
-    <wol-spinner :store="store"></wol-spinner>
-    <chart-dialog></chart-dialog>
-    <transition name="fade">
-        <div v-show="!store.loading">
-            <div id="money-header">
-                <div class="tx-form">
-                    <tx-form/>
+    <div class="app-layout">
+        <wol-spinner :store="store"></wol-spinner>
+        <chart-dialog></chart-dialog>
+        <transition name="fade">
+            <div v-show="!store.loading">
+                <div id="money-header">
+                    <div class="tx-form">
+                        <tx-form />
+                    </div>
+                </div>
+                <div id="money-main" v-if="!store.loading">
+                    <div id="money-container">
+                        <stats-list></stats-list>
+                        <accounts-list></accounts-list>
+                        <transactions-list></transactions-list>
+                        <tags-list></tags-list>
+                    </div>
                 </div>
             </div>
-            <div id="money-main" v-if="!store.loading">
-                <div id="money-container">
-                    <stats-list></stats-list>
-                    <accounts-list></accounts-list>
-                    <transactions-list></transactions-list>
-                    <tags-list></tags-list>
-                </div>
-            </div>
-        </div>
-    </transition>
-</div>
+        </transition>
+    </div>
 </template>
 
 <script>
@@ -36,7 +36,7 @@ import TagsList from './components/TagsList.vue'
 
 export default {
     components :{
-
+        ChartDialog, StatsList, AccountsList, TransactionsList, TagsList
     },
 
     data: function () {
@@ -1112,5 +1112,5 @@ export default {
             };
         }
     }
-
+}
 </script>
