@@ -33,12 +33,9 @@
 <script>
 import $store from "../store.js";
 import AccountItem from "./AccountItem.vue";
-import _ from "underscore";
 
 export default {
-    components: {
-        AccountItem
-    },
+    components: { AccountItem },
 
     data() {
         return {

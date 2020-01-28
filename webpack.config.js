@@ -5,8 +5,8 @@ module.exports = {
     entry: ['babel-polyfill', './client/src/main.js'],
     
     externals: {
-        jQuery: 'jQuery',
-        underscore: '_',
+        $: 'jQuery',
+        _: '_',
         firebase: 'firebase',
         moment: 'moment',
         toastr: 'toastr',

@@ -3,6 +3,26 @@ const config = require('./config');
 let _endPost = require("./endReq")("__cache__/api/weeks");
 
 //GET /[:name]
+function renderIndex(req, res) {
+    res.render("index.html");
+}
+
+//GET 
+function renderServerParams(req, res) {
+    res.render("server.html", config.serverParams());
+}
+
+//GET /login
+function renderLogin(req, res) {
+    res.render("login/login-vue.html", config.serverParams());
+}
+
+//GET /test
+function test(req, res) {
+    res.send("test");
+}
+
+/*
 function renderWol(req, res) {
     res.render("wol/wol-vue.html", config.serverParams());
 }
@@ -10,11 +30,7 @@ function renderWol(req, res) {
 // GET /test/wol
 function renderTestWol(req, res) {
     res.render("wol/wol-vue.html", require("./test_data/wol_data"));
-}
-
-function renderServerParams(req, res) {
-    res.render("server.html", config.serverParams());
-}
+}*/
 
 //GET /api/wol/weeks
 function getWeeks(req, res) {
@@ -53,24 +69,14 @@ function saveWeek(req, res) {
     .exec(_endPost.bind(res))
 }
 
-//GET /test
-function test(req, res) {
-    res.send("test");
-}
-
-//GET /login
-function renderLogin(req, res) {
-    res.render("login/login-vue.html", config.serverParams());
-}
 
 module.exports = {
-    renderWol,
-    renderTestWol,
     getWeeks,
     saveWeek,
     test,
     renderLogin,
-    renderServerParams
+    renderServerParams,
+    renderIndex
 };
 
 //create    add

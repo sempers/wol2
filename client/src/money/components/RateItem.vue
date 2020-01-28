@@ -13,10 +13,13 @@
 <script>
 import $store from '../store.js'
 import $bus from '../../bus.js'
+import $filters from '../filters.js'
 import Amount from './Amount.vue'
 
 export default {
-    components: {Amount},
+    components: { Amount },
+
+    filters: $filters,
 
     props: ["item"],
 

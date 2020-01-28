@@ -14,7 +14,6 @@
 import $store from '../store.js'
 import $filters from '../filters.js'
 
-
 export default {
     props: ["amount", "currency", "category", "secondary"],
 

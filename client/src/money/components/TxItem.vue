@@ -122,8 +122,6 @@
 
 <script>
 import $store from "../store.js";
-import _ from "underscore";
-import moment from "moment";
 import $bus from "../../bus.js";
 import Amount from "./Amount.vue";
 

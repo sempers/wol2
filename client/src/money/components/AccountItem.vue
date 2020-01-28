@@ -21,7 +21,7 @@ import Balance from './Balance.vue'
 import CatIcon from './CatIcon.vue'
 
 export default {
-    components: {Balance, CatIcon},
+    components: { Balance, CatIcon },
 
     props: ["account"],
 

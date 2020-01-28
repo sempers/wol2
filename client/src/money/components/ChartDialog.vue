@@ -70,13 +70,8 @@
 import { LOG, ERROR, FIX_TIME } from '../../utils/logging.js'
 import $store from '../store.js'
 import $bus from '../../bus.js'
-import moment from 'moment'
-import d3 from 'd3'
-import jQuery from 'jQuery'
-import _ from 'underscore'
 
 var __ym = $store.ym;
-var $ = jQuery;
 
 const MYGREEN = "#6ba583";
 const MYRED = "#d75442"

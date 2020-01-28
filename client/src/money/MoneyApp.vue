@@ -6,7 +6,7 @@
             <div v-show="!store.loading">
                 <div id="money-header">
                     <div class="tx-form">
-                        <tx-form />
+                        <tx-form></tx-form>
                     </div>
                 </div>
                 <div id="money-main" v-if="!store.loading">
@@ -27,7 +27,8 @@ import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'
 import { TRY_AUTH, LOGOUT } from '../utils/fb.js'
 import $store from './store.js'
 import $bus from '../bus.js'
-import axios from 'axios'
+import $filters from './filters.js'
+import TxForm from './components/TxForm.vue'
 import ChartDialog from './components/ChartDialog.vue'
 import StatsList from './components/StatsList.vue'
 import AccountsList from './components/AccountsList.vue'
@@ -36,7 +37,7 @@ import TagsList from './components/TagsList.vue'
 
 export default {
     components :{
-        ChartDialog, StatsList, AccountsList, TransactionsList, TagsList
+        TxForm, ChartDialog, StatsList, AccountsList, TransactionsList, TagsList
     },
 
     data: function () {
@@ -51,7 +52,7 @@ export default {
         this.store.loading = true;
         LOG('created()', 'checking the auth with firebase');
         //fb.bindAuth(async () => {
-            init();
+            this.init();
         //}, 'money');
     },
 
@@ -399,7 +400,7 @@ export default {
             _.extend(__s.rateItems["BNBUSD"], _calcAvgEntrance("BNB", ["USD"], "Invest_Bnb", "BNB", 2019));
             _.extend(__s.rateItems["ETHUSD"], _calcAvgEntrance("ETH", ["USD"], "Invest_Eth", "ETH", 2020));
 
-            __s.totalBalance_USD = this.$options.filters.fmtAmount(this.store.convert(__s.totalBalance, "RUB", "USD"), {
+            __s.totalBalance_USD = $filters.fmtAmount(this.store.convert(__s.totalBalance, "RUB", "USD"), {
                 places: 0
             }); //OK - we count this at the NOW moment
         },

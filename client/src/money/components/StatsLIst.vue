@@ -104,14 +104,14 @@
 
 <script>
 import $store from "../store.js";
-import _ from "underscore";
-import moment from "moment";
 import $bus from "../../bus.js";
 import RateItem from "./RateItem.vue";
+import CatIcon from "./CatIcon.vue"
+import Balance from "./Balance.vue"
 import Amount from "./Amount.vue";
 
 export default {
-    components: { RateItem, Amount },
+    components: { RateItem, Amount, CatIcon, Balance },
 
     data() {
         return {

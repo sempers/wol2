@@ -67,7 +67,6 @@
 import $store from "../store.js";
 import $bus from "../../bus.js";
 import Amount from "./Amount.vue";
-import _ from "underscore";
 
 export default {
     components: { Amount },
