@@ -46,6 +46,6 @@ export default {
                 return this.store.rate(this.item.sym1, 0);
             }
         }
-    },
+    }
 }
 </script>

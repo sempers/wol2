@@ -136,6 +136,10 @@ async function mwRates(req, res, next) {
         next();
     } else {
         //load historical rates
+        let prevRates = {
+            "YM": 0,
+            "RUB": 1.0
+        };
         try {
             let prevRates = (await db.HistoricalRates.find({}).exec()).map(doc => doc.toObject());
             for (let i = 0; i < prevRates.length; i++) {

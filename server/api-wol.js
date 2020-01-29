@@ -9,7 +9,7 @@ function renderIndex(req, res) {
 
 //GET 
 function renderServerParams(req, res) {
-    res.render("server.html", config.serverParams());
+    res.render("serverParams.html", config.serverParams());
 }
 
 //GET /login
@@ -21,16 +21,6 @@ function renderLogin(req, res) {
 function test(req, res) {
     res.send("test");
 }
-
-/*
-function renderWol(req, res) {
-    res.render("wol/wol-vue.html", config.serverParams());
-}
-
-// GET /test/wol
-function renderTestWol(req, res) {
-    res.render("wol/wol-vue.html", require("./test_data/wol_data"));
-}*/
 
 //GET /api/wol/weeks
 function getWeeks(req, res) {

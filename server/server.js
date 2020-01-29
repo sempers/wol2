@@ -17,10 +17,10 @@ const app = express();
 
 app.engine("html", cons.ejs);
 app.set('view engine', 'html');
-app.set("views", path.resolve(__dirname, '../client'));
+app.set("views", path.resolve(__dirname, '../client/public'));
 app.set('trust proxy', 1);
 
-app.use(express.static(path.resolve(__dirname, '../client'), {
+app.use(express.static(path.resolve(__dirname, '../client/public'), {
     etag: false
 }));
 
@@ -36,14 +36,6 @@ app.use(cookieSession({
 //html
 app.get("/serverParams.js", api_wol.renderServerParams);
 app.get("/login", api_wol.renderLogin);
-
-/*app.get("/wol", api_wol.renderWol);
-app.get("/login", api_wol.renderLogin);
-app.get("/test/wol", api_wol.renderTestWol);
-app.get("/test/money", api_money.mwRates, api_money.testMoney);
-app.get("/money", api_money.renderMoney);
-app.get("/msg", api_msg.renderMsg);
-app.get("/:name", api_wol.renderWol);*/
 
 //API
 //wol
@@ -89,10 +81,6 @@ app.get("/api/msg/:weekNum", api_msg.getWeekMessages);
 
 app.get("/", api_wol.renderIndex);
 app.get("/:name", api_wol.renderIndex);
-
-//default
-/*app.get("/", api_wol.renderWol);
-app.get("/money", api_wol.renderWol);*/
 
 db.connect();
 
