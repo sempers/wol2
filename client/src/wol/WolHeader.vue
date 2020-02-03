@@ -24,6 +24,7 @@
     .weeks-infoed {
         color: #448aff;
         margin-left: 45px;
+        float:left;
     }
 
     .remained {

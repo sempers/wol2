@@ -28,6 +28,31 @@
     </md-dialog>
 </template>
 
+<style lang="less">
+#pillsDialog {
+    width: 750px;
+    height: 500px;
+    display: inline-table;
+}
+
+.pills-table {
+    clear:both;
+
+    td.md-table-cell {
+        padding: 0;
+        height: 16px;
+
+        &.ar {
+            text-align: right;
+        }
+
+        input {
+            width: 50px;
+        }
+    }
+}
+</style>
+
 <script>
 import $store from './store.js'
 import { LOG } from '../utils/logging.js'
@@ -113,7 +138,7 @@ export default {
                 pill.finish = ls.local().format('D MMMM YYYY');
                 this.obj.lastSave = new Date();
             });
-            LOG('count()', `Pills recounted at ${this.obj.lastSave}`)
+            LOG('count()', `Pills recalculated at ${this.obj.lastSave}`)
         },
 
         close() {

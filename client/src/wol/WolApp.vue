@@ -3,35 +3,84 @@
     <wol-navbar :current="'wol'"></wol-navbar>
     <wol-spinner :store="store"></wol-spinner>
     <transition name="fade">
-    <div v-show="!store.loading">
-        <div class="cntnr">
-            <wol-header></wol-header>
-            <wol-table></wol-table>
-            <wol-tagbar></wol-tagbar>
-        </div>
-        </div>
+    <div class="wol-container" v-show="!store.loading">
+        <wol-header></wol-header>
+        <div style="position:relative">
+            <table class="year-table clearfix">
+                <tr v-for="(year_weeks, year, index) in store.years" :key="year">
+                    <td class="year-row year-header" >{{year}}<span class="uninfoed" v-if="countUninfoed(year_weeks)">({{countUninfoed(year_weeks)}})</span></td>
+                    <td class="year-row year-weeks">
+                        <div class="week-placeholder" v-if="index === 0" :style="'width:' + store.firstYearPlaceHolderWidth + 'px'"></div>
+                        <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week"></week-item>
+                    </td>
+                </tr>
+            </table> 
+            <wol-tagbar></wol-tagbar>            
+        </div>            
+    </div>
     </transition>
     <edit-dialog></edit-dialog>
     <map-dialog></map-dialog>
     <message-dialog></message-dialog>
     <pills-dialog></pills-dialog>
-    </div>
+</div>
 </template>
 
 <style lang="less">
+@import "./assets/wol-vars.less";
 
+.app-layout {
+    background-color: @window-background;
+}
+
+.wol-container {
+    width: 1120px;
+    margin: 0 auto;
+}
+
+.year-table {
+    margin: 0;
+    width: 1120px;
+}
+
+.year-row {
+    height: 20px;
+    vertical-align: middle;
+
+    &.year-header {
+        font-family: Roboto;
+        color: @window-foreground;
+        font-weight: bold;
+        display: inline-block;
+        width: 50px;
+        font-size: 15px;
+    }
+}
+
+.uninfoed {
+    color: @color-gray;
+    font-size: 10px;
+    font-weight: normal;
+    position: relative;
+    top: -3px;
+}
+
+.week-placeholder {
+    border: 0;
+    margin: 0;
+    display: inline-block;
+    background: @window-background;
+}
 </style>
+
 <script>
 import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'
 import { TRY_AUTH, LOGOUT } from '../utils/fb.js'
-import WeekModel from './WeekModel.js'
-import _ from 'underscore'
-import axios from 'axios'
 import $bus from '../bus.js'
 import $store from './store.js'
+import WeekModel from './WeekModel.js'
 import WolSpinner from '../common/WolSpinner.vue'
 import WolHeader from './WolHeader.vue'
-import WolTable from './WolTable.vue'
 import WolTagbar from './WolTagbar.vue'
 import WeekItem from './WeekItem.vue'
 import EditDialog from './EditDialog.vue'
@@ -46,12 +95,16 @@ export default {
         }
     },
 
-    components: {WeekItem, EditDialog, MessageDialog, PillsDialog, MapDialog, WolSpinner, WolHeader, WolTagbar, WolTable},
+    components: {WeekItem, EditDialog, MessageDialog, PillsDialog, MapDialog, WolSpinner, WolHeader, WolTagbar},
 
     computed: {
         c_tags() {
             return _.sortBy(this.store.tags.stats, ti => ti.tag);
-        }
+        },
+
+        c_tagIcons() {
+            return ['#ng', '#dr', '#buy', '#mov', '#games', '#major', '#interview', '#buh', '#acid', '#meet', '#crush', '#love', '#breakup', '#ill', '#exam', '#death', '#bad', '#sea', '#abroad'];
+        },
     },
 
     created() {
@@ -127,6 +180,12 @@ export default {
             this.store.loading = true;
             LOGOUT();
             window.location.replace('/login');
+        },
+
+         //---------------------------- Расчеты в режиме недельки -----------------------------------------------------
+        //посчитать сколько не заполнено в году
+        countUninfoed(year_weeks) {
+            return _.reduce(year_weeks, (memo, week) => memo + +(!week.info & !week.future), 0)
         },
 
         initData(data) {
@@ -360,7 +419,7 @@ export default {
                 })
             });
             //добавляем картинкотаги (0)
-            this.getTagIcons().forEach(tag => {
+            this.c_tagIcons.forEach(tag => {
                 if (!stats.find(ti => ti.tag == tag)) {
                     stats.push({
                         tag: tag,
@@ -409,7 +468,6 @@ export default {
                 }
             });
         },
-
 
         /**
         * поиск слова в инфо
@@ -533,3 +591,4 @@ export default {
     }
 }
 </script>
+

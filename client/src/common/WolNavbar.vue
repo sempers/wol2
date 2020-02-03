@@ -8,19 +8,28 @@
 		<wol-navbtn v-show="current == 'wol' || current == 'money'" :icon="'exit_to_app'" :link="'javascript:;'" @click.native.capture="emit('logout')" :text="'Log out'"></wol-navbtn>
     </div>
 </template>
+
 <style>
-	.wol-nabbar {
+	.wol-navbar {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		position: absolute;
+		top: 0;
+		left: 0;
+		padding: 4px 0 0 0;
 		z-index: 1000;
 	}
 </style>
+
 <script>
-	import WolNavBtn from "./WolNavBtn";
+	import WolNavbtn from "./WolNavbtn.vue";
 	import $bus from "../bus.js"
 
 	export default {
 		props: ["current"],
 
-		components: { WolNavBtn },
+		components: { WolNavbtn },
 
 		data() {
 			return {

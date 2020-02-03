@@ -1,7 +1,7 @@
 <template>
     <md-dialog id="editDialog" :md-active.sync="store.shownEditDialog">
         <md-dialog-content>
-            <div class="pl md-title">{{store.curWeek.desc}}</div>
+            <div class="pl md-title curweek-desc">{{store.curWeek.desc}}</div>
             <div class="action-btn" @click="store.shownEditDialog = false">
                 <md-button class="md-icon-button md-dense">
                     <md-icon>clear</md-icon>
@@ -56,6 +56,10 @@
 #editDialog .md-dialog-content:first-child {
     padding-top: 22px;
     width: 800px !important;
+}
+
+.curweek-desc {
+    font-family: Roboto;
 }
 
 @media (max-width:1080px) {

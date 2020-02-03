@@ -15,7 +15,7 @@ module.exports = {
     },
 
     output: {
-        path: path.resolve(__dirname, './client/dist'),
+        path: path.resolve(__dirname, './client/public/dist'),
         publicPath: '/dist/',
         filename: 'build.js'
     },
@@ -38,6 +38,7 @@ module.exports = {
                 loader: 'vue-loader',
                 options: {
                     loaders: {
+                        less: 'vue-style-loader!css-loader!less-loader'
                     }
                 }
             },

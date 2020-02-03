@@ -4,3 +4,128 @@
 @color-gray: #aaa;
 @color-tagged: yellow;
 @color-selected:orange;
+
+/* BASIC CLASSES */
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    color: #333;
+    background-color: @window-background;
+    box-sizing: initial;
+    -webkit-font-smoothing: none !important;
+}
+
+li {
+    line-height: 24px;
+}
+
+ul {
+    padding-left: 0;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+/* MAIN WINDOW */
+.loading {
+    width: 800px;
+    height: 600px;
+    margin: 400px auto;
+    text-align: center;
+    z-index: 1000;
+}
+
+.caption {
+    font-size: 64px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* dialog.css */
+.md-dialog {
+    z-index: 100;
+    border-radius: 4px;
+    transform: translate(-50%, -50%) !important;
+}
+
+.md-dialog-content {
+    padding-bottom: 0;
+}
+
+.md-dialog-actions {
+    min-height: 48px;
+    padding: 0 24px 8px 8px;
+}
+
+.md-button-content {
+    margin-left: -10px;
+    margin-right: 6px;
+}
+
+.md-tabs-navigation .md-ripple {
+    padding: 0;
+}
+
+.md-overlay {
+    z-index: 5 !important;
+}
+
+.md-button,
+.md-button-clear {
+    font-size: 13px !important;
+}
+
+.md-field {
+    min-height: 36px;
+    margin-bottom: 12px;
+}
+
+.md-tabs-navigation .md-button-content {
+    position: static;
+    margin-left: 2px;
+}
+
+.md-tabs-navigation>.md-button {
+    text-transform: none;
+    max-width: 160px !important;
+    min-width: 130px !important;
+    font-size: 12px !important;
+    border: 1px solid #eee;
+}
+
+.md-title {
+    line-height: normal;
+}
+
+td.md-table-cell {
+    height: 20px;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
+    opacity: 0;
+}
+
+.ib {
+    display: inline-block;
+}
+
+.pl {
+    float: left;
+}
+
+.pr {
+    float: right;
+}
+
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}
