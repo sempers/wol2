@@ -5,43 +5,9 @@
     <transition name="fade">
     <div v-show="!store.loading">
         <div class="cntnr">
-            <header style="padding-top:58px">
-                <div>
-                    <div class="pl">
-                        <strong>Прожито {{store.lived.percentage}}</strong>, недель: <strong>{{store.lived.weeks}}</strong>, дней: <strong>{{store.lived.days}}</strong>, часов: <strong>{{store.lived.hours}}</strong>
-                    </div>
-                    <div class="pl weeks-infoed">
-                        Недель заполнено: <strong>{{c_infoed}} ({{((c_infoed / store.lived.weeks) * 100).toFixed(1) + '%'}})</strong>
-                    </div>
-                    <div class="pr" style="position:relative;left:-27px">
-                        <strong>Осталось {{store.remained.percentage}}</strong>, недель: <strong>{{store.remained.weeks}}</strong>, дней: <strong>{{store.remained.days}}</strong>, часов: <strong>{{store.remained.hours}}</strong>
-                    </div>
-                </div>
-            </header>
-            <div style="position:relative">
-                <table class="yeartable clearfix">
-                    <tr v-for="(year_weeks, year, index) in store.years" :key="year">
-                        <td class="yeartd year-header" valign="middle">{{year}}<span class="uninfoed" v-if="countUninfoed(year_weeks)">({{countUninfoed(year_weeks)}})</span></td>
-                        <td class="yeartd year-weeks" valign="middle">
-                            <div class="week-placeholder" v-if="index === 0" :style="'width:' + store.firstYearPlaceHolderWidth + 'px'"></div>
-                            <week-item v-for="week in year_weeks" :key="week.weekNum" :week="week"></week-item>
-                        </td>
-                    </tr>
-                </table>
-                <div class="tag-bar">
-                    <div class="tag-bar-item" v-for="ti in c_tags" :key="ti.tag">
-                        <div :class="'wi-outer wi-inner ' + ti.tag.replace('#','')" v-if="getTagIcons().includes(ti.tag)"></div>
-                        <a href="" @click.prevent="setTagged(ti)" class="tag-link" :class="{'strong': ti.weekNums.length>20, 'tag-selected': ti.tag == store.curTag}">{{ti.tag}}<small>&nbsp;</small>({{ti.weekNums.length}})&nbsp;&nbsp;&nbsp; </a>
-                    </div>
-                    <md-field>
-                        <label>Поиск</label>
-                        <md-input type="text" v-model="store.searchedWord" style="width:300px" />
-                    </md-field>
-                    <div style="text-align:center">
-                        <md-button type="button" @click="searchWord()">Искать в описаниях</md-button>
-                    </div>
-                </div>                        
-            </div>
+            <wol-header></wol-header>
+            <wol-table></wol-table>
+            <wol-tagbar></wol-tagbar>
         </div>
         </div>
     </transition>
@@ -52,6 +18,9 @@
     </div>
 </template>
 
+<style lang="less">
+
+</style>
 <script>
 import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'
 import { TRY_AUTH, LOGOUT } from '../utils/fb.js'
@@ -61,6 +30,9 @@ import axios from 'axios'
 import $bus from '../bus.js'
 import $store from './store.js'
 import WolSpinner from '../common/WolSpinner.vue'
+import WolHeader from './WolHeader.vue'
+import WolTable from './WolTable.vue'
+import WolTagbar from './WolTagbar.vue'
 import WeekItem from './WeekItem.vue'
 import EditDialog from './EditDialog.vue'
 import MapDialog from './MapDialog.vue'
@@ -74,13 +46,9 @@ export default {
         }
     },
 
-    components: {WeekItem, EditDialog, MessageDialog, PillsDialog, MapDialog, WolSpinner},
+    components: {WeekItem, EditDialog, MessageDialog, PillsDialog, MapDialog, WolSpinner, WolHeader, WolTagbar, WolTable},
 
     computed: {
-        c_infoed() {
-            return _.reduce(this.store.weeks, (memo, w) => +(!!w.info & !w.future) + memo, 0);
-        },
-
         c_tags() {
             return _.sortBy(this.store.tags.stats, ti => ti.tag);
         }
@@ -105,6 +73,8 @@ export default {
         $bus.$on("prev-week", this.prevWeek);
         $bus.$on("next-week", this.nextWeek);
         $bus.$on("logout", this.logout);
+        $bus.$on("set-tagged", this.setTagged);
+        $bus.$on("search-word", this.searchWord);
     },
 
     updated() {
@@ -130,11 +100,7 @@ export default {
             } catch (err) {
                 ERROR('created()', "loading /api/wol/weeks failed");
             }
-        },
-
-        getTagIcons() {
-            return ['#ng', '#dr', '#buy', '#mov', '#games', '#major', '#interview', '#buh', '#acid', '#meet', '#crush', '#love', '#breakup', '#ill', '#exam', '#death', '#bad', '#sea', '#abroad'];
-        },
+        },        
 
         checkWiTime(time) {
             this.store.test.wiTimes.push(time);
@@ -251,11 +217,7 @@ export default {
             if (!this.store.shownPillsDialog) {
                 this.store.shownPillsDialog = true;
             }
-        },
-
-        //---------------------------- Расчеты в режиме недельки -----------------------------------------------------
-        //посчитать сколько не заполнено в году
-        countUninfoed: year_weeks => _.reduce(year_weeks, (memo, week) => memo + +(!week.info & !week.future), 0),
+        },        
 
         //----------------------------Загрузка и сохранение в режиме неделек -----------------------------------------
         /**

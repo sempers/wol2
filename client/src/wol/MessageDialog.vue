@@ -1,5 +1,5 @@
 <template>
-    <md-dialog id="msgDialog" class="msg-dialog" :md-active.sync="store.shownMessageDialog">
+    <md-dialog class="msg-dialog" :md-active.sync="store.shownMessageDialog">
         <md-dialog-content>
             <div class="pl md-title">{{store.curWeek.desc}}</div>
             <div class="action-btn" @click="store.shownMessageDialog = false">
@@ -54,7 +54,104 @@
         </md-dialog-content>
     </md-dialog>
 </template>
+<style lang="less">
+.msg-dialog {
+    width: 660px !important;
+    min-height: 600px;
+    overflow-y: auto;
+}
 
+.chat-cntnr {
+    width: 400px;
+    margin: 0 auto;
+}
+
+.names-column {
+    max-width: 250px;
+}
+
+ul.chat-column {
+    width: 330px;
+    list-style: none;
+    margin-right: 5px;
+    margin-top: 0;
+    padding: 0 5px;
+    background-color: lightblue;
+    border-radius: 4px;
+    border: 1px solid #999;
+    max-height: 500px;
+    overflow-y: scroll;
+}
+
+li.msg {
+    width: 100%;
+}
+
+.msg-inner {
+    background-color: white;
+    box-sizing: border-box;
+    max-width: 250px;
+    border-radius: 4px;
+    padding: 4px;
+    margin: 2px 0;
+    display: inline-block;
+    text-align: left;
+
+    &:first-child {
+        margin-top: 4px;
+    }
+
+    :last-child {
+        margin-bottom: 4px;
+    }
+}
+
+li.msg.me {
+    text-align: right;
+
+    .msg-inner {
+        background-color: lightyellow;
+    }
+}
+
+.chat-title {
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 5px;
+    color: black;
+}
+
+.channel-icon {
+    width: 12px;
+    height: 12px;
+}
+
+.msg-header {
+    height: 10px;
+    line-height: 10px;
+    vertical-align: middle;
+}
+
+.msg-sender {
+    color: #555;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.msg-date {
+    color: gray;
+    font-size: 10px;
+    float: right;
+    margin-left: 4px;
+}
+
+.msg-text {
+    font-size: 11px;
+    line-height: 14px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+</style>
 <script>
 import $store from "./store.js";
 import $bus from "../bus.js";

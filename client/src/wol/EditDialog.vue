@@ -22,12 +22,12 @@
                     <li
                         class="colored-flag"
                         v-for="cf in store.curWeek.colored_flags"
-                        :style="'background-color:' + cf.color"
+                        :style="'background-color:' + cf.color" :key="cf.name"
                     >{{cf.name}}</li>
                 </ul>
             </div>
             <div class="tag-icons" v-if="tagicons.length > 0">
-                <div class="wi-icon-placeholder" v-for="tagicon in tagicons" :class="tagicon"></div>
+                <div class="wi-icon-placeholder" v-for="tagicon in tagicons" :class="tagicon" :key="tagicon"></div>
             </div>
             <md-field>
                 <label>Описание</label>
@@ -52,6 +52,82 @@
     </md-dialog>
 </template>
 
+<style lang="less">
+#editDialog .md-dialog-content:first-child {
+    padding-top: 22px;
+    width: 800px !important;
+}
+
+@media (max-width:1080px) {
+    #editDialog .md-dialog-content:first-child {
+        padding-top: 22px;
+        width: 600px !important;
+    }
+
+    .hide-mobile {
+        display: none;
+    }
+}
+
+#week_info_textarea {
+    font-size: 14px;
+    line-height: 26px;
+    min-height: 78px;
+    padding-bottom: 6px;
+}
+
+.md-field .md-textarea {
+    max-height: 240px;
+}
+
+.colored-flag {
+    display: inline-flex;
+    margin-right: 4px;
+    justify-content: center;
+    border-radius: 4px;
+    color: black;
+    font-size: 12px;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 4px;
+}
+
+.colored-flags {
+    float: right;
+    position: relative;
+    top: -2px;
+    margin-right: 5px;
+}
+
+.tag-icons {
+    float: right;
+    display: inline-flex;
+    height: 20px;
+    align-items: center;
+    background-color: #f0f0f0;
+    margin-right: 4px;
+    padding: 0 4px 0 4px;
+}
+
+.action-btn {
+    float: right;
+    position: relative;
+    top: -8px;
+}
+
+.action-btn button {
+    margin: 2px;
+}
+
+.action-btn .md-button .md-ripple {
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 4px;
+    display: inline-block;
+    margin: 0;
+}
+</style>
+
 <script>
 import $store from "./store.js";
 import $bus from "../bus.js";
@@ -62,7 +138,7 @@ export default {
         return {
             store: $store,
             isMobile: false
-        };
+        }
     },
 
     computed: {
@@ -80,8 +156,7 @@ export default {
     mounted() {
         $bus.$on("curweek-changed", this.adjustArea);
         let device = new UAParser().getDevice();
-        this.isMobile =
-            device && (device.type == "mobile" || device.type == "tablet");
+        this.isMobile = device && (device.type == "mobile" || device.type == "tablet");
     },
 
     methods: {

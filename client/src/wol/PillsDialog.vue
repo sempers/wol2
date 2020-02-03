@@ -112,8 +112,8 @@ export default {
                 ls.add(days, 'day');
                 pill.finish = ls.local().format('D MMMM YYYY');
                 this.obj.lastSave = new Date();
-                LOG('count()', `Pills recounted at ${this.obj.lastSave}`)
             });
+            LOG('count()', `Pills recounted at ${this.obj.lastSave}`)
         },
 
         close() {
