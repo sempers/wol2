@@ -63,6 +63,103 @@
     </div>
 </template>
 
+<style lang="less">
+.tag-item {
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 48px;
+    display: block;
+    border-bottom: 1px transparent;
+
+    &.active {
+        font-weight: bold;
+        background-color: #d0d0d0;
+    }
+
+    &.disabled {
+        color: #ccc;
+    }
+
+    &:hover:not(.active) {
+        background-color: #f0f0f0;
+    }
+
+    .tag-delete {
+        float: right;
+        position: relative;
+        top: -8px;
+    }
+}
+
+.change-color-placeholder {
+    display: inline-block;
+    width: 16px;
+    height: 48px;
+}
+
+.tag-color {
+    width: 16px;
+    height: 47px;
+    display: inline-block;
+}
+
+.tag-info {
+    box-sizing: border-box;
+    width: 360px;
+    display: inline-block;
+    height: 48px;
+    padding: 15px 16px 16px 10px;
+
+    .edited {
+        width: 500px;
+        padding: 0;
+        margin: 0;
+        position: relative;
+        top: -21px;
+    }
+}
+
+.tag-budget {
+    float: right;
+    text-align: left;
+    font-size: 11px;
+    width: 140px;
+    padding: 2px 2px 0 8px;
+    opacity: 0.8;
+    box-sizing: border-box;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    position: relative;
+    top: -2px;
+
+    &.no-border {
+        border: none;
+    }
+
+    &.income {
+        color: green;
+    }
+
+    &.expense {
+        color: #E72020;
+    }
+    
+    &.transfer {
+        color: #0E64BA;
+    }
+}
+
+.tag-name {
+    float: left;
+}
+
+.tag-amount {
+    float: right;
+    margin-right: 12px;
+}
+</style>
+
 <script>
 import $store from "../store.js";
 import $bus from "../../bus.js";

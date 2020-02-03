@@ -10,6 +10,28 @@
     </div>
 </template>
 
+<style lang="less">
+.secondary-amount {
+    float: right;
+    color: darkgray !important;
+    font-size: 11px !important;
+    padding-right: 13px;
+    clear: both;
+    position: relative;
+    top: -8px;
+    left: 10px;
+    font-weight: normal !important;
+
+    &.rate {
+        clear:none;
+        top:-4px;
+        left:5px;
+    }
+}
+
+
+</style>
+
 <script>
 import $store from '../store.js'
 import $filters from '../filters.js'

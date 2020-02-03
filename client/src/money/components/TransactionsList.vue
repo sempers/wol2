@@ -1,6 +1,6 @@
 <template>
     <div id="middle-col">
-        <div class="txlist-header">
+        <div id="txlist-header">
             <div style="width:300px">
                 <md-button
                     class="md-icon-button md-dense"
@@ -87,11 +87,11 @@
                 </div>
             </template>
         </div>
-        <div class="txlist-list" :style="{'min-height': minHeight}">
+        <div id="txlist-list" :style="{'min-height': minHeight}">
             <div class="no-transactions" v-if="!store.cur.tx.length">Транзакции отсутствуют</div>
             <tx-item v-else v-for="tx in transactions" :tx="tx" :key="tx.f41_id"></tx-item>
         </div>
-        <div class="txlist-below">
+        <div id="txlist-footer">
             <div v-show="store.cur.tag && store.cur.avgRateBuy">
                 <md-icon>compare_arrows</md-icon>Покупка:
                 <amount :amount="store.cur.avgRateBuy" :type="''" :options="{places: 2}"></amount>Продажа:
@@ -100,6 +100,53 @@
         </div>
     </div>
 </template>
+
+<style lang="less">
+#middle-col {
+    float: left;
+    width: 848px;
+    border-top-style: none;
+    background-color: #ffffff;
+}
+
+#txlist-header {
+    background-color: #fafafa;
+    padding: 9px 10px 12px 7px;
+    border-bottom: 1px solid #eeeeee;
+    height: 48px;
+    box-sizing: border-box;
+    vertical-align: middle;
+
+    &>div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .txlist-header-month {
+        width: 104px;
+        /* padding-left: 10px; */
+        display: inline-block;
+        /* vertical-align: middle; */
+        padding-top: 7px;
+        text-align: center;
+    }
+}
+
+#txlist-list {
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+#txlist-footer {
+    height: 40px;
+    padding:10px;
+    background-color:#f5f5f5;
+}
+
+.delta-pct {
+    font-size: 0.85em
+}
+</style>
 
 <script>
 import $store from "../store.js";

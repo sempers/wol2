@@ -9,7 +9,29 @@
         <div class="secondary-amount rate" v-if="rateSecondary">{{rateSecondary | fmtAmount({places: 0})}} RUB</div>
     </div>
 </template>
+<style lang="less">
+.secondary-rate {
+    float: right;
+    color: darkgray !important;
+    font-size: 11px !important;
+    padding-right: 13px;
+    clear: both;
+    position: relative;
+    top: -8px;
+    left: 10px;
+    font-weight: normal !important;
+}
 
+.rate-profit {
+    float: left;
+    position: relative;
+    top: -4px;
+    color: darkslategray !important;
+    font-size: 11px !important;
+    clear: both;
+    font-weight: normal !important;
+}
+</style>
 <script>
 import $store from '../store.js'
 import $bus from '../../bus.js'

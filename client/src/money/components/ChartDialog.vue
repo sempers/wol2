@@ -66,6 +66,143 @@
 </md-dialog> 
 </template>
 
+<style lang="less">
+path.line {
+    stroke-width: 1;
+    stroke: #000;
+    fill: none;
+}
+
+.data1 {
+    stroke: green;
+}
+
+.data2 {
+    stroke: orange;
+}
+
+.axis {
+    shape-rendering: crispEdges;
+}
+
+.x-axis line {
+    stroke: lightgrey;
+}
+
+.x-axis .minor {
+    stroke-opacity: .5;
+}
+
+.x-axis path,
+.x-axis line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1;
+}
+
+.x-axis text {
+    font-size: 11px;
+}
+
+.y-axis line,
+.y-axis path {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1;
+}
+
+.y-axis text {
+    font-size: 11px;
+}
+
+.dot {
+    fill: #555;
+    stroke: #fff;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: left;
+    display: inline-block;
+    padding: 6px;
+    font: 11px monospace;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 10000;
+    opacity: 0.9;
+}
+
+#chartDialog {
+    max-height: 96%;
+    display: inline-table;
+}
+
+#chart {
+    /* width: 100%; */
+    min-width: 1200px;
+    border: 0;
+}
+
+.chart-select {
+    height: 32px;
+    box-sizing: border-box;
+}
+
+.tag-bar {
+    opacity: 0.9
+}
+
+.delta-bar {
+    opacity: 0.7
+}
+
+.chart-dates {
+    margin-left: 50px;
+    font: 16px monospace;
+    color: #aaa;
+}
+
+#chart-menu {
+    width: 100%;
+    height: 60px
+}
+
+#chartDialog .md-dialog-content {
+    padding-top: 12px;
+}
+
+.balance-candle:hover,
+.tag-bar:hover {
+    stroke: yellow;
+    stroke-width: 2px;
+}
+
+.balance-candle {
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.balance-candle.now-candle {
+    stroke-dasharray: 2px;
+}
+
+.tag-bar.now-bar {
+    stroke-dasharray: 2px;
+    stroke: gray;
+    stroke-width: 1px;
+    opacity: 0.6;
+}
+.balance-rise {
+    fill: white;
+}
+
+.balance-fall {
+    fill: gray;
+}
+</style>
+
 <script>
 import { LOG, ERROR, FIX_TIME } from '../../utils/logging.js'
 import $store from '../store.js'

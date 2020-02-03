@@ -14,6 +14,38 @@
     </div>
 </template>
 
+<style lang="less">
+.acc-item {
+    box-sizing: border-box;
+    height: 48px;
+    width: 250px;
+    padding: 15px 16px 16px 10px;
+    display: block;
+
+    &.hidden {
+        color: #ccc;
+    }
+
+    &.active {
+        font-weight: bold;
+        background-color: #d0d0d0;
+    }
+
+    &:hover:not(.active) {
+        background-color: #e4e4e4;
+    }
+
+    .md-field {
+        margin-bottom:0;margin-top:-5px;padding:0;display:inline-block;
+    }
+}
+
+.hide-checkbox {
+    float: right;
+    display: inline-flex;
+    margin: 0;
+}
+</style>
 <script>
 import $store from '../store.js'
 import $bus from '../../bus.js'

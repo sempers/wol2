@@ -4,7 +4,7 @@
         @click="edit()"
         :class='{"income": tx.type == "income", "expense": tx.type == "expense", "transfer": tx.type=="transfer", "balance_reset": tx.type == "balance_reset"}'
     >
-        <div class="viewed" v-show="!tx.isEdited" @click="edit()">
+        <div class="tx-viewed" v-show="!tx.isEdited" @click="edit()">
             <div class="tx-amount">
                 <div class="tx-id">{{tx.f41_id}}</div>
                 <amount :amount="amount" :type="tx.type" :category="category"></amount>
@@ -58,7 +58,7 @@
             <md-button class="md-raised md-accent md-dense" @click.stop="remove()">Да</md-button>
             <md-button class="md-raised md-dense" @click.stop="tx.isRemoved = false">Нет</md-button>
         </div>
-        <div v-if="tx.isEdited" class="edited-tx">
+        <div v-if="tx.isEdited" class="tx-edited">
             <div style="width:100%">
                 <div class="md-layout md-gutter">
                     <div class="md-layout-item" style="max-width:110px">
@@ -120,6 +120,214 @@
     </div>
 </template>
 
+<style lang="less">
+.tx-item {
+    width: 100%;
+    border-bottom: 1px solid #eee;
+    display: block;
+    padding: 0;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    .tx-viewed {
+        width: 100%;
+        height: 47px;
+
+        &:hover {
+            background-color: #f0f0f0
+        }
+
+        &>div {
+            display: inline-block;
+            padding: 15px 16px 16px 16px;
+            height: 47px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+    }
+}
+
+.tx-item:hover .show-hovered,
+.tag-item:hover .show-hovered {
+    display: inline-block;
+}
+
+.tx-amount {
+    width: 118px;
+    text-align: right;
+    padding-right: 8px;
+    float: left;
+}
+
+.tx-item.expense .tx-amount {
+    background-color: #fff8f8;
+}
+
+.tx-item.expense.small .tx-amount {
+    background-color: #fff8f8;
+}
+
+.tx-item.expense.medium .tx-amount {
+    background-color: #fff0f0;
+}
+
+.tx-item.expense.large .tx-amount {
+    background-color: #ffe8e8;
+}
+
+.tx-item.income .tx-amount {
+    background-color: #f0fff0;
+}
+
+.tx-item.balance_reset .tx-amount {
+    background-color: #f0f0f0;
+}
+
+.tx-item.transfer .tx-amount {
+    background-color: #f0f0ff;
+}
+
+.tx-item {
+    .tx-id {
+        font-size: 8px;
+        font-style: italic;
+        float: left;
+    }
+
+    .tx-tags-text {
+        /* background-color: white; */
+        position: relative;
+        /* left: -1px; */
+        float: left;
+    }
+
+    .tx-tags-text-blank {
+        width: 60px;
+        display: inline !important;
+        float: left;
+        /*background-color: white;*/
+    }
+
+    .tx-name {
+        font-size: 12px;
+        color: #777;
+        float: left;
+        max-width: 380px;
+        overflow: hidden;
+        display: flex !important;
+        justify-content: center;
+        padding: 0 0 0 16px !important;
+        flex-direction: column;
+    }
+
+    .tx-difference {
+        float: left;
+    }
+
+    .tx-date {
+        float: right;
+        text-align: right;
+        width: 80px;
+    }
+
+    .tx-account {
+        float: right;
+        text-align: left;
+        width: 140px;
+        text-decoration: underline;
+        text-decoration-color: #aaa;
+    }
+
+    .tx-balance {
+        float: right;
+        width: 126px;
+        padding-left: 3px;
+        padding-right: 10px;
+        background-color: transparent !important;
+    }
+
+    .tx-delete {
+        float: right;
+        padding: 8px !important;
+        width: 50px;
+    }
+
+    .tx-trade-icon {
+        background-color: white;
+        border-radius: 50px;
+        color: white;
+        border: 1px solid;
+        font-size: 10px;
+        height: 25px !important;
+        padding: 1px 4px 6px 4px !important;
+        margin: 10px !important;
+        float: right;
+        opacity: 0.8;
+
+        &.buy {
+            border-color: green;
+            color:green;
+        }
+
+        &.sell {
+            border-color: red;
+            color: red;
+        }
+    }
+}
+
+.tx-rate {
+    margin-top: 16px;
+    text-align: left;
+
+    .edited-tx & {
+        margin-top: 8px;
+    }
+}
+
+.no-transactions {
+    text-align: center;
+    color: #aaa;
+    font-size: 16px;
+    padding: 24px;
+    font-weight: 100;
+}
+
+.btn-item {
+    height: 48px;
+    text-align: right;
+}
+
+.btn-item-title {
+    font-weight: bold;
+    padding-top: 12px;
+}
+
+.btn-item>div {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+
+.edited-tx .md-field,
+.tag-info.edited .md-field {
+    margin-top: -6px;
+    margin-bottom: 0;
+}
+
+.tar {
+    text-align: right;
+}
+
+.tx-balance-detail {
+    text-align: left;
+    float: left;
+    padding-top: 16px;
+    padding-left: 100px;
+    color: #888;
+    font-size: 0.9em;
+}
+</style>
 <script>
 import $store from "../store.js";
 import $bus from "../../bus.js";

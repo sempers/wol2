@@ -102,6 +102,54 @@
     </div>
 </template>
 
+<style lang="less">
+#stats-col {
+    float: left;
+    width: 260px;
+    border: 1px dashed lightgray;
+    background-color: #e0e0e0;
+    margin-right: 20px;
+}
+
+.stats-net-worth {
+    height: 58px;
+
+    .account-name {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .account-balance .amount {
+        color: rgb(48, 121, 237);
+        font-weight: bold;
+        font-size: 16px;
+    }
+}
+
+.stats-rates {
+    background-color: #f0f0f0;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.stats-flat:hover {
+    color: darkorange;
+}
+
+.stats-mortgage:hover {
+    color: crimson;
+}
+
+.stats-items:hover {
+    color: seagreen;
+}
+
+.last-updated {
+    font-weight: normal;
+    font-size: 13px;
+}
+</style>
+
 <script>
 import $store from "../store.js";
 import $bus from "../../bus.js";

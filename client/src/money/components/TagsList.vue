@@ -58,11 +58,39 @@
                 <md-tooltip>Общий месячный бюджет</md-tooltip>
             </div>
         </div>
-        <div class="pinned-tags-list">
+        <div class="tags-list">
             <tag-item v-for="tag in store.cur.tags" :tag="tag" :key="tag.name"></tag-item>
         </div>
     </div>
 </template>
+
+<style lang="less">
+#right-col {
+    float: left;
+    width: 540px;
+}
+
+.tags-list {
+    width: 100%;
+}
+
+#right-col-header {
+    width: 360px;
+}
+
+#right-col-header-menu {
+    position: relative;
+    top: -8px;
+    float: left;
+}
+
+#total-budget {
+    font-size: 12px;
+    font-weight: bold;
+    left: 20px;
+    top: -4px;
+}
+</style>
 
 <script>
 import $store from "../store.js";

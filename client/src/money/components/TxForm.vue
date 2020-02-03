@@ -56,6 +56,20 @@
 </div>
 </template>
 
+<style lang="less">
+/* TX-FORM */
+.tx-form {
+    width: 1920px;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.md-field.mb0 {
+    margin-bottom: 0
+}
+</style>
+
 <script>
 import $bus from '../../bus.js'
 import $store from '../store.js'

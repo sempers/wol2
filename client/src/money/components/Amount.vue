@@ -1,7 +1,36 @@
 <template>
 <div class="amount" :class='{"income": amount > 0 && (!type || type=="income"), "expense": amount < 0 && (!type || type=="expense"), "transfer": (type=="transfer" || type=="transfer-fix"), "balance_reset": type == "balance_reset"}'>{{amount | fmtAmount(c_options)}}</div>
 </template>
+<style lang="less">
+.amount {
+    display: inline-block;
 
+    &.income {
+        color: green;
+    }
+
+    &.expense {
+        color: #E72020;
+    }
+
+    &.balance {
+        color: #222;
+    }
+
+    &.transfer {
+        color: #0E64BA;
+    }
+
+    &.mini {
+        font-size: 0.85em;
+        font-weight: normal;
+    }
+
+    .balance_reset {
+        color: #222;
+    }
+}
+</style>
 <script>
 import $filters from '../filters.js'
 

@@ -21,6 +21,104 @@
         </transition>
     </div>
 </template>
+<style lang="less">
+body {
+    font-family: "Roboto", sans-serif;
+    background-color: inherit;
+    font-size: 13px !important;
+}
+
+a:focus {
+    outline: none;
+}
+
+.show-hovered {
+    display: none;
+}
+
+/*LAYOUT*/
+#money-header {
+    width: 100%;
+    border-bottom: 1px solid #eee;
+}
+
+#money-main {
+    #money-container {
+        width: 1920px;
+        margin: 0 auto;
+    }
+}
+
+.md-checkbox .md-checkbox-label {
+    padding-left: 12px;
+}
+
+/* md-money.css */
+
+.md-field {
+    min-height: 28px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    margin-bottom: 12px;
+
+    label {
+        font-size: 13px;
+    }
+
+    .md-input, .md-textarea {
+        font-size: 13px;
+        height: 30px;
+    }
+}
+
+.md-field.md-focused .md-input,
+.md-field.md-focused .md-textarea,
+.md-field.md-has-value .md-input,
+.md-field.md-has-value .md-textarea {
+    font-size: 13px;
+}
+
+.md-layout.md-gutter>.md-layout-item {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+.md-layout.md-gutter {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.md-autocomplete button {
+    position: relative;
+    top: -2px;
+}
+
+.md-datepicker {
+    margin-top: 0;
+
+    .md-icon {
+        position: relative;
+        top: -2px;
+    }
+}
+
+.item {
+    box-sizing: border-box;
+    height: 48px;
+    width: 260px;
+    padding: 15px 16px 17px 16px;
+    display: block;
+
+    &.active {
+        font-weight: bold;
+        background-color: #d0d0d0;
+    }
+
+    &:hover:not(.active) {
+        background-color: #d0d0d0;
+    }
+}
+</style>
 
 <script>
 import { LOG, ERROR, FIX_TIME } from '../utils/logging.js'

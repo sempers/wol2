@@ -30,6 +30,33 @@
     </div>
 </template>
 
+<style lang="less">
+#left-col {
+    float: left;
+    width: 250px;
+}
+
+.account-name {
+    overflow: hidden;
+    word-break: break-all;
+    float: left;
+}
+
+.account-balance {
+    float: right;
+    margin-right: 10px;
+}
+
+.currency-code {
+    font-size: 11px;
+    font-weight: 100;
+    float: right;
+    margin-top: 3px;
+    position: relative;
+    left: -3px;
+    top: -2px;
+}
+</style>
 <script>
 import $store from "../store.js";
 import AccountItem from "./AccountItem.vue";
