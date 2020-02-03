@@ -31,18 +31,13 @@ module.exports = {
             }, 
             {
                 test: /\.less$/,
-                use: [
-                'vue-style-loader',
-                'css-loader',
-                'less-loader'
-                ],
+                use: [ 'vue-style-loader', 'css-loader', 'less-loader' ],
             },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
                     loaders: {
-                        less: 'vue-style-loader!css-loader?sourceMap!less-loader?sourceMap'
                     }
                 }
             },
